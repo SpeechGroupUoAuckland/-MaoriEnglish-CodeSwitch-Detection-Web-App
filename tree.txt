@@ -1,0 +1,227 @@
+.
+├── 20220321_Hansard_DB_all.csv
+├── 20220321_Hansard_DB_all.tsv
+├── 20220321_Hansard_DB_gen_MP_only.csv
+├── 20220321_Hansard_DB_MP_only.csv
+├── 20220321_Hansard_DB_MP_only.tsv
+├── 20220321_Hansard_DB_MP_only_window_2.csv
+├── 20220321_Hansard_DB_MP_only_window_3.csv
+├── 20220321_Hansard_DB_test_MP_only.csv
+├── 20220321_Hansard_DB_test_only.csv
+├── biLSTM
+│   ├── bilstm.py
+│   ├── bilstmLower.py
+│   ├── bilstmSize2.py
+│   ├── bilstmSize2Lower.py
+│   ├── bilstmSize3.py
+│   ├── bilstmSize3Lower.py
+│   ├── miwiki_model2_MPW300SG.vec
+│   └── test
+│       ├── hybirdModelFullSizeBiLSTM.ipynb
+│       ├── hybirdModelSize2BiLSTM.ipynb
+│       └── hybirdModelSize3BiLSTM.ipynb
+├── dbAnalysis.ipynb
+├── envInstall.bat
+├── finLabelGen.py
+├── LICENSE
+├── maori_dict.txt
+├── mbert
+│   ├── mbert.py
+│   ├── mbertLower.py
+│   ├── mbertSize2.py
+│   ├── mbertSize2Lower.py
+│   ├── mbertSize3.py
+│   ├── mbertSize3Lower.py
+│   ├── test
+│   │   └── hybirdModelMbert.ipynb
+│   └── wandb
+│       └── run-20220616_165740-3andolr1
+│           ├── files
+│           │   ├── conda-environment.yaml
+│           │   ├── config.yaml
+│           │   ├── output.log
+│           │   ├── requirements.txt
+│           │   ├── wandb-metadata.json
+│           │   └── wandb-summary.json
+│           ├── logs
+│           │   ├── debug.log
+│           │   └── debug-internal.log
+│           ├── run-3andolr1.wandb
+│           └── tmp
+│               └── code
+├── models
+│   ├── biLSTM
+│   │   ├── lowerCase
+│   │   │   ├── bilstm.h5
+│   │   │   ├── bilstmSize2.h5
+│   │   │   ├── bilstmSize3.h5
+│   │   │   ├── checkpoint
+│   │   │   │   ├── assets
+│   │   │   │   ├── keras_metadata.pb
+│   │   │   │   ├── saved_model.pb
+│   │   │   │   └── variables
+│   │   │   │       ├── variables.data-00000-of-00001
+│   │   │   │       └── variables.index
+│   │   │   ├── f1ScoreMulticlassBilstmHansard.txt
+│   │   │   ├── f1ScoreMulticlassBilstmHansardSize2.txt
+│   │   │   ├── f1ScoreMulticlassBilstmHansardSize3.txt
+│   │   │   ├── tokenizerBilstm.pickle
+│   │   │   ├── tokenizerBilstmSize2.pickle
+│   │   │   └── tokenizerBilstmSize3.pickle
+│   │   ├── normalCase
+│   │   │   ├── bilstm.h5
+│   │   │   ├── bilstmSize2.h5
+│   │   │   ├── bilstmSize3.h5
+│   │   │   ├── checkpoint
+│   │   │   │   ├── assets
+│   │   │   │   ├── keras_metadata.pb
+│   │   │   │   ├── saved_model.pb
+│   │   │   │   └── variables
+│   │   │   │       ├── variables.data-00000-of-00001
+│   │   │   │       └── variables.index
+│   │   │   ├── f1ScoreMulticlassBilstmHansard.txt
+│   │   │   ├── f1ScoreMulticlassBilstmHansardSize2.txt
+│   │   │   ├── f1ScoreMulticlassBilstmHansardSize3.txt
+│   │   │   ├── tokenizerBilstm.pickle
+│   │   │   ├── tokenizerBilstmSize2.pickle
+│   │   │   └── tokenizerBilstmSize3.pickle
+│   │   └── old
+│   │       ├── lowerCase
+│   │       │   ├── bilstm.h5
+│   │       │   ├── bilstmSize2.h5
+│   │       │   ├── bilstmSize3.h5
+│   │       │   ├── f1ScoreMulticlassBilstmHansard.txt
+│   │       │   ├── f1ScoreMulticlassBilstmHansardSize2.txt
+│   │       │   ├── f1ScoreMulticlassBilstmHansardSize3.txt
+│   │       │   ├── tokenizerBilstm.pickle
+│   │       │   ├── tokenizerBilstmSize2.pickle
+│   │       │   └── tokenizerBilstmSize3.pickle
+│   │       └── normalCase
+│   │           ├── bilstm.h5
+│   │           ├── bilstmSize2.h5
+│   │           ├── bilstmSize3.h5
+│   │           ├── f1ScoreMulticlassBilstmHansard.txt
+│   │           ├── f1ScoreMulticlassBilstmHansardSize2.txt
+│   │           ├── f1ScoreMulticlassBilstmHansardSize3.txt
+│   │           ├── tokenizerBilstm.pickle
+│   │           ├── tokenizerBilstmSize2.pickle
+│   │           └── tokenizerBilstmSize3.pickle
+│   └── mbert
+│       ├── lowerCase
+│       │   └── fullSize
+│       │       └── 2022-07-04_14-12-24
+│       │           ├── m_bert_hf_out
+│       │           │   ├── checkpoint-13156
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   ├── checkpoint-26312
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   ├── checkpoint-39468
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   ├── checkpoint-52624
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   └── runs
+│       │           │       └── Jul04_14-12-24_hasel-artemis
+│       │           │           ├── 1656900746.5299132
+│       │           │           │   └── events.out.tfevents.1656900746.hasel-artemis.20308.1
+│       │           │           └── events.out.tfevents.1656900746.hasel-artemis.20308.0
+│       │           └── model
+│       │               ├── config.json
+│       │               ├── pytorch_model.bin
+│       │               └── training_args.bin
+│       ├── normalCase
+│       │   ├── fullSize
+│       │   │   └── 2022-06-16_16-57-36
+│       │   │       ├── m_bert_hf_out
+│       │   │       │   ├── checkpoint-263104
+│       │   │       │   │   ├── config.json
+│       │   │       │   │   ├── optimizer.pt
+│       │   │       │   │   ├── pytorch_model.bin
+│       │   │       │   │   ├── rng_state.pth
+│       │   │       │   │   ├── scheduler.pt
+│       │   │       │   │   ├── trainer_state.json
+│       │   │       │   │   └── training_args.bin
+│       │   │       │   └── runs
+│       │   │       │       └── Jun16_16-57-36_hasel-artemis
+│       │   │       │           ├── 1655355459.6240745
+│       │   │       │           │   └── events.out.tfevents.1655355459.hasel-artemis.2536932.1
+│       │   │       │           └── events.out.tfevents.1655355459.hasel-artemis.2536932.0
+│       │   │       └── model
+│       │   │           ├── config.json
+│       │   │           ├── pytorch_model.bin
+│       │   │           └── training_args.bin
+│       │   └── size2
+│       │       └── 2022-06-27_02-10-43
+│       │           └── m_bert_hf_out
+│       │               └── runs
+│       │                   └── Jun27_02-10-43_DESKTOP-9GMA2KP
+│       │                       ├── 1656252643.8292477
+│       │                       │   └── events.out.tfevents.1656252643.DESKTOP-9GMA2KP.24620.1
+│       │                       └── events.out.tfevents.1656252643.DESKTOP-9GMA2KP.24620.0
+│       └── tokenizer
+│           ├── special_tokens_map.json
+│           ├── tokenizer.json
+│           ├── tokenizer_config.json
+│           └── vocab.txt
+├── README.md
+├── semiAutoTestSetGen.py
+├── size2LabelGen.py
+├── size3LabelGen.py
+├── small_data.csv
+├── tree.txt
+└── web
+    ├── maori_dict.txt
+    ├── models
+    │   ├── bilstm.h5
+    │   ├── bilstmLower.h5
+    │   ├── bilstmSize2.h5
+    │   ├── bilstmSize2Lower.h5
+    │   ├── bilstmSize3.h5
+    │   ├── bilstmSize3Lower.h5
+    │   ├── mbert
+    │   │   ├── config.json
+    │   │   ├── pytorch_model.bin
+    │   │   └── training_args.bin
+    │   ├── mbertLower
+    │   │   ├── config.json
+    │   │   ├── pytorch_model.bin
+    │   │   └── training_args.bin
+    │   ├── tokenizerBilstm.pickle
+    │   ├── tokenizerBilstmLower.pickle
+    │   ├── tokenizerBilstmSize2.pickle
+    │   ├── tokenizerBilstmSize2Lower.pickle
+    │   ├── tokenizerBilstmSize3.pickle
+    │   ├── tokenizerBilstmSize3Lower.pickle
+    │   └── tokenizerMbert
+    │       ├── special_tokens_map.json
+    │       ├── tokenizer.json
+    │       ├── tokenizer_config.json
+    │       └── vocab.txt
+    ├── runServers.bat
+    ├── webapi.py
+    └── website.py
+
+57 directories, 167 files
