@@ -171,8 +171,10 @@ if NO_INIT:
                 else:
                     if w >= 4 and w % 2 == 0:
                         result += detectCodeSwitchingPointDynamicWindowVersion(" ".join(this_window), w-2, tokenizer, loaded_model)
-                    else:
+                    elif w > 1:
                         result += detectCodeSwitchingPointDynamicWindowVersion(" ".join(this_window), w-1, tokenizer, loaded_model)
+                    else:
+                        result += detectCodeSwitchingPointDynamicWindowVersion(" ".join(this_window), w, tokenizer, loaded_model)
                 ptr += w
             return result
     ### End of BiLSTM model ###
@@ -243,8 +245,10 @@ if NO_INIT:
                 else:
                     if w >= 4 and w % 2 == 0:
                         result += detectCodeSwitchingPointMbertVersion(" ".join(this_window), w-2, model)
-                    else:
+                    elif w > 1:
                         result += detectCodeSwitchingPointMbertVersion(" ".join(this_window), w-1, model)
+                    else:
+                        result += detectCodeSwitchingPointMbertVersion(" ".join(this_window), w, model)
                 ptr += w
             return result
     ### End of Mbert model ###

@@ -1,48 +1,41 @@
-#!/usr/bin/env python3
-
-###############################################################
-# Method: Get
-# EndPoint: /, /getModel and getInfo, if the endpoint is not valid, it will fallback to getInfo
-# Query format and corresponding response format:: 
-#   /?model=<model_name>&text=<text> -> list [E, M, E, E, M, M ...], E: English, M: Māori
-#   /getModel -> list [model_name, model_name, model_name, ...]
-#   /getInfo -> string The usage and the purpose of the API
-###############################################################
-
-from flask import Flask, redirect, request
-from flask_restful import Api
+import torch
+from transformers import AutoTokenizer
+from transformers import AutoModelForSequenceClassification
+import json
+import pandas as pd
+import numpy as np
 import re
 import pickle
 import tensorflow as tf
 from keras.utils.data_utils import pad_sequences
 import numpy as np
-import torch
-from transformers import AutoTokenizer
-from transformers import AutoModelForSequenceClassification
 
-app = Flask(__name__)
-api = Api(app)
+# Read test set
+test = pd.read_csv('20220321_Hansard_DB_test_MP_only.csv')
+# only take the rows with Processed = 'Y'
+test = test[test['Processed'] == 'Y']
 
+base_folder = './web/models/'
 # Parameters #
-full_size_bilstm_model_path = 'models/bilstm.h5'
-full_size_bilstm_tokenizer_path = 'models/tokenizerBilstm.pickle'
-full_size_bilstm_lower_model_path = 'models/bilstmLower.h5'
-full_size_bilstm_lower_tokenizer_path = 'models/tokenizerBilstmLower.pickle'
+full_size_bilstm_model_path = base_folder+'bilstm.h5'
+full_size_bilstm_tokenizer_path = base_folder+'tokenizerBilstm.pickle'
+full_size_bilstm_lower_model_path = base_folder+'bilstmLower.h5'
+full_size_bilstm_lower_tokenizer_path = base_folder+'tokenizerBilstmLower.pickle'
 
-size_2_bilstm_model_path = 'models/bilstmSize2.h5'
-size_2_bilstm_tokenizer_path = 'models/tokenizerBilstmSize2.pickle'
-size_2_bilstm_lower_model_path = 'models/bilstmSize2Lower.h5'
-size_2_bilstm_lower_tokenizer_path = 'models/tokenizerBilstmSize2Lower.pickle'
+size_2_bilstm_model_path = base_folder+'bilstmSize2.h5'
+size_2_bilstm_tokenizer_path = base_folder+'tokenizerBilstmSize2.pickle'
+size_2_bilstm_lower_model_path = base_folder+'bilstmSize2Lower.h5'
+size_2_bilstm_lower_tokenizer_path = base_folder+'tokenizerBilstmSize2Lower.pickle'
 
-size_3_bilstm_model_path = 'models/bilstmSize3.h5'
-size_3_bilstm_tokenizer_path = 'models/tokenizerBilstmSize3.pickle'
-size_3_bilstm_lower_model_path = 'models/bilstmSize3Lower.h5'
-size_3_bilstm_lower_tokenizer_path = 'models/tokenizerBilstmSize3Lower.pickle'
+size_3_bilstm_model_path = base_folder+'bilstmSize3.h5'
+size_3_bilstm_tokenizer_path = base_folder+'tokenizerBilstmSize3.pickle'
+size_3_bilstm_lower_model_path = base_folder+'bilstmSize3Lower.h5'
+size_3_bilstm_lower_tokenizer_path = base_folder+'tokenizerBilstmSize3Lower.pickle'
 
-full_size_mbert_model_path = 'models/mbert'
-full_size_mbert_lower_model_path = 'models/mbertLower'
+full_size_mbert_model_path = base_folder+'mbert'
+full_size_mbert_lower_model_path = base_folder+'mbertLower'
 
-mbert_tokenizer_path = 'models/tokenizerMbert'
+mbert_tokenizer_path = base_folder+'tokenizerMbert'
 # End of parameters #
 
 # Load models #
@@ -105,7 +98,7 @@ def cleanText(text):
 def sentenceCategory(sentence, padding_length, tokenizer, loaded_model):
     seq = tokenizer.texts_to_sequences([sentence])
     padded = pad_sequences(seq, maxlen=padding_length)
-    predict = loaded_model.predict(padded) 
+    predict = loaded_model.predict(padded, verbose = 0) 
     classw = np.argmax(predict,axis=1)
     return int(classw[0])
 
@@ -260,61 +253,66 @@ def transfrom(a: list) -> list:
         if item == 1:
             a[index] = 'M'
         elif item == 2:
-            a[index] = 'E'
+            a[index] = 'P'
         else:
             a[index] = 'U'
-    a = ", ".join(a)
     return a
 # End of functions #
 
-@app.route('/favicon.ico', methods=['GET'])
-def favicon():
-    return redirect("https://aotearoavoices.nz/favicon.ico")
+# Test
+def test_model(model_name, window_size):
+    model = globals()[f'{model_name}_model']
+    tokenizer = globals()[f'{model_name}_tokenizer']
 
-@app.route('/getModel', methods=['GET'])
-def getModel():
-        return '<title>M/E CW Detection API</title>Avaliable Models are: size_2_bilstm, size_2_bilstm_lower, size_3_bilstm, size_3_bilstm_lower, full_size_bilstm, full_size_bilstm_lower, full_size_mbert, full_size_mbert_lower.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'
+    lower_flag = True if 'lower' in model_name else False
 
-@app.route('/getInfo', methods=['GET'])
-def getInfo():
-    return '<title>M/E CW Detection API</title>This API is used to detect the code switching point between English and Māori.<br/><br/>Query format: /?model=&ltmodel_name&gt&text=&lttext&gt<br/><br/>Response format: E, M, E, E, M, M ..., where E is English, M is Māori<br/><br/>To get the list of models, visit <a href="./getModel">getModel</a>.<br/><br/>To get the usage and the purpose of the API, visit <a href="./getInfo">getInfo</a>.<r/><br/><br/>For more information of the definition of code switch detection and the models used, please visit: <a href="https://openreview.net/forum?id=rAxl_GibSWq">https://openreview.net/forum?id=rAxl_GibSWq</a><div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'
+    word_count = 0
+    wrong_word_count = 0
+    wrong_word_dict = {} # {word1: count1, word2: count2, ...}
 
-@app.errorhandler(404)
-def not_found(error):
-    return redirect('/getInfo') # Modify
+    sentence_count = 0
+    wrong_sentence_count = 0
+    wrong_sentence_list = [] # [row.id1, row.id2, ...]
 
-@app.route('/', methods=['GET'])
-def detect():
-    args = request.args
-    if 'model' not in args or 'text' not in args:
-        return redirect('/getInfo') # Modify
-    else:
-        model_name = args['model']
-        text = args['text']
-        if model_name == "size_2_bilstm":
-            return transfrom(detectCodeSwitchingPointDynamicWindowVersion(text, 2, size_2_bilstm_tokenizer, size_2_bilstm_model))
-        elif model_name == "size_2_bilstm_lower":
-            return transfrom(detectCodeSwitchingPointDynamicWindowVersion(text.lower(), 2, size_2_bilstm_lower_tokenizer, size_2_bilstm_lower_model))
-
-        elif model_name == "size_3_bilstm":
-            return transfrom(detectCodeSwitchingPointDynamicWindowVersion(text, 3, size_3_bilstm_tokenizer, size_3_bilstm_model))
-        elif model_name == "size_3_bilstm_lower":
-            return transfrom(detectCodeSwitchingPointDynamicWindowVersion(text.lower(), 3, size_3_bilstm_lower_tokenizer, size_3_bilstm_lower_model))
-        
-        elif model_name == "full_size_bilstm":
-            return transfrom(detectCodeSwitchingPointDynamicWindowVersion(text, 250, full_size_bilstm_tokenizer, full_size_bilstm_model))
-        elif model_name == "full_size_bilstm_lower":
-            return transfrom(detectCodeSwitchingPointDynamicWindowVersion(text.lower(), 250, full_size_bilstm_lower_tokenizer, full_size_bilstm_lower_model))
-        
-        elif model_name == "full_size_mbert":
-            return transfrom(detectCodeSwitchingPointMbertVersion(text, 4, full_size_mbert_model))
-        elif model_name == "full_size_mbert_lower":
-            return transfrom(detectCodeSwitchingPointMbertVersion(text.lower(), 4, full_size_mbert_lower_model))
-        
+    for row in test.itertuples():
+        text = row.text.lower() if lower_flag else row.text
+        predict = transfrom(detectCodeSwitchingPointDynamicWindowVersion(text, window_size, tokenizer, model))
+        real = list(row.label)
+        if len(predict) == len(real):
+            wrong_sentence = False
+            for index, item in enumerate(predict):
+                word_count += 1
+                if item != real[index]:
+                    wrong_sentence = True
+                    wrong_word_count += 1
+                    current_word = row.text.split()[index].lower()
+                    if current_word not in wrong_word_dict:
+                        wrong_word_dict[current_word] = 1
+                    else:
+                        wrong_word_dict[current_word] += 1
+            if wrong_sentence:
+                wrong_sentence_count += 1
+                wrong_sentence_list.append(row.id)
+            sentence_count += 1
         else:
-            return redirect('/getInfo') # Modify
+            # print("Error: length of predict and real is not equal,", row.id)
+            pass
 
-if __name__ == '__main__':
-    # Bind 127.0.0.1:8500, only accept connections from localhost
-    app.run(host='127.0.0.1', port=8500, debug=True)
-    
+    # Save the wrong words and wrong sentences
+    with open(f"evaluation/{model_name}_error_dict.json", "w") as f:
+        f.write('{\n'+f'"{wrong_word_count}/{word_count}":')
+        json.dump(wrong_word_dict, f)
+        f.write(f',\n"{wrong_sentence_count}/{sentence_count}":')
+        json.dump(wrong_sentence_list, f)
+        f.write('\n}')
+
+# pool.starmap(test_model, [('full_size_bilstm', 250), ('full_size_bilstm_lower', 250), ('size_2_bilstm', 2), ('size_2_bilstm_lower', 2), ('size_3_bilstm', 3), ('size_3_bilstm_lower', 3)])
+
+test_model('full_size_bilstm', 250)
+test_model('full_size_bilstm_lower', 250)
+
+test_model('size_2_bilstm', 2)
+test_model('size_2_bilstm_lower', 2)
+
+test_model('size_3_bilstm', 3)
+test_model('size_3_bilstm_lower', 3)
