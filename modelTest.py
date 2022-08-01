@@ -280,8 +280,8 @@ def test_model(model_name, window_size):
         real = list(row.label)
         if len(predict) == len(real):
             wrong_sentence = False
+            word_count += len(real)
             for index, item in enumerate(predict):
-                word_count += 1
                 if item != real[index]:
                     wrong_sentence = True
                     wrong_word_count += 1
@@ -290,9 +290,13 @@ def test_model(model_name, window_size):
                         wrong_word_dict[current_word] = 1
                     else:
                         wrong_word_dict[current_word] += 1
+                else:
+                    pass
             if wrong_sentence:
                 wrong_sentence_count += 1
                 wrong_sentence_list.append(row.id)
+            else:
+                pass
             sentence_count += 1
         else:
             # print("Error: length of predict and real is not equal,", row.id)
@@ -306,7 +310,6 @@ def test_model(model_name, window_size):
         json.dump(wrong_sentence_list, f)
         f.write('\n}')
 
-# pool.starmap(test_model, [('full_size_bilstm', 250), ('full_size_bilstm_lower', 250), ('size_2_bilstm', 2), ('size_2_bilstm_lower', 2), ('size_3_bilstm', 3), ('size_3_bilstm_lower', 3)])
 
 test_model('full_size_bilstm', 250)
 test_model('full_size_bilstm_lower', 250)
@@ -314,5 +317,5 @@ test_model('full_size_bilstm_lower', 250)
 test_model('size_2_bilstm', 2)
 test_model('size_2_bilstm_lower', 2)
 
-test_model('size_3_bilstm', 3)
+test_model('size_3_bilstmd', 3)
 test_model('size_3_bilstm_lower', 3)
