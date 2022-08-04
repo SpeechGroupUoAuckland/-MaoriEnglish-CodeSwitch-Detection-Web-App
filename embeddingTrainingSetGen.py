@@ -21,7 +21,6 @@ def cleanText(text):
     text = text.replace('a. m', 'a.m').replace('p. m', 'p.m')
     return text.strip()            
 
-
 data = ''
 for dir, _, filenames in os.walk('embeddingTraining'):
     for filename in filenames:
@@ -53,6 +52,3 @@ data = clean(data,
 # save the cleaned text
 with open('embeddingTraining/cleaned_text.txt', 'w') as f:
     f.write(data)
-
-
-

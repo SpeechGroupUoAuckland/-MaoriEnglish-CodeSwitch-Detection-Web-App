@@ -21,7 +21,573 @@
 │       ├── hybirdModelSize2BiLSTM.ipynb
 │       └── hybirdModelSize3BiLSTM.ipynb
 ├── dbAnalysis.ipynb
+├── embeddingTraining
+│   ├── cleaned_text.txt
+│   ├── clean-merged-LCM-maorionly.txt
+│   ├── clean-merged-LCM-withEng.txt
+│   ├── final-TeTaka-Database.txt
+│   ├── full_tweet.txt
+│   ├── label_per_sentence_Hansard.csv
+│   ├── miwiki-latest-pages-articles_preprocessed.txt
+│   ├── NgaMahi-katoa-C.txt
+│   └── niupepa_text_withenglish.txt
+├── embeddingTrainingSetGen.py
 ├── envInstall.bat
+├── evaluation
+│   ├── full_size_bilstm_error_dict.json
+│   ├── full_size_bilstm_lower_error_dict.json
+│   ├── size_2_bilstm_error_dict.json
+│   ├── size_2_bilstm_lower_error_dict.json
+│   ├── size_3_bilstm_error_dict.json
+│   └── size_3_bilstm_lower_error_dict.json
+├── fastText
+│   ├── alignment
+│   │   ├── align.py
+│   │   ├── eval.py
+│   │   ├── example.sh
+│   │   ├── README.md
+│   │   ├── unsup_align.py
+│   │   ├── unsup_multialign.py
+│   │   └── utils.py
+│   ├── classification-example.sh
+│   ├── classification-results.sh
+│   ├── CMakeLists.txt
+│   ├── CODE_OF_CONDUCT.md
+│   ├── CONTRIBUTING.md
+│   ├── crawl
+│   │   ├── dedup.cc
+│   │   ├── download_crawl.sh
+│   │   ├── filter_dedup.sh
+│   │   ├── filter_utf8.cc
+│   │   ├── process_wet_file.sh
+│   │   └── README.md
+│   ├── docs
+│   │   ├── aligned-vectors.md
+│   │   ├── api.md
+│   │   ├── autotune.md
+│   │   ├── cheatsheet.md
+│   │   ├── crawl-vectors.md
+│   │   ├── dataset.md
+│   │   ├── english-vectors.md
+│   │   ├── faqs.md
+│   │   ├── language-identification.md
+│   │   ├── options.md
+│   │   ├── pretrained-vectors.md
+│   │   ├── python-module.md
+│   │   ├── references.md
+│   │   ├── supervised-models.md
+│   │   ├── supervised-tutorial.md
+│   │   ├── support.md
+│   │   ├── unsupervised-tutorials.md
+│   │   └── webassembly-module.md
+│   ├── download_model.py
+│   ├── eval.py
+│   ├── fasttext.pc.in
+│   ├── get-wikimedia.sh
+│   ├── LICENSE
+│   ├── Makefile
+│   ├── MANIFEST.in
+│   ├── python
+│   │   ├── benchmarks
+│   │   │   ├── get_word_vector.py
+│   │   │   └── README.rst
+│   │   ├── doc
+│   │   │   └── examples
+│   │   │       ├── bin_to_vec.py
+│   │   │       ├── compute_accuracy.py
+│   │   │       ├── FastTextEmbeddingBag.py
+│   │   │       ├── get_vocab.py
+│   │   │       ├── train_supervised.py
+│   │   │       └── train_unsupervised.py
+│   │   ├── fasttext_module
+│   │   │   └── fasttext
+│   │   │       ├── __init__.py
+│   │   │       ├── FastText.py
+│   │   │       ├── pybind
+│   │   │       │   └── fasttext_pybind.cc
+│   │   │       ├── tests
+│   │   │       │   ├── __init__.py
+│   │   │       │   ├── test_configurations.py
+│   │   │       │   └── test_script.py
+│   │   │       └── util
+│   │   │           ├── __init__.py
+│   │   │           └── util.py
+│   │   ├── README.md
+│   │   └── README.rst
+│   ├── quantization-example.sh
+│   ├── README.md
+│   ├── reduce_model.py
+│   ├── runtests.py
+│   ├── scripts
+│   │   ├── kbcompletion
+│   │   │   ├── data.sh
+│   │   │   ├── eval.cpp
+│   │   │   ├── fb15k.sh
+│   │   │   ├── fb15k237.sh
+│   │   │   ├── README.md
+│   │   │   ├── svo.sh
+│   │   │   └── wn18.sh
+│   │   └── quantization
+│   │       └── quantization-results.sh
+│   ├── setup.cfg
+│   ├── setup.py
+│   ├── src
+│   │   ├── args.cc
+│   │   ├── args.h
+│   │   ├── autotune.cc
+│   │   ├── autotune.h
+│   │   ├── densematrix.cc
+│   │   ├── densematrix.h
+│   │   ├── dictionary.cc
+│   │   ├── dictionary.h
+│   │   ├── fasttext.cc
+│   │   ├── fasttext.h
+│   │   ├── loss.cc
+│   │   ├── loss.h
+│   │   ├── main.cc
+│   │   ├── matrix.cc
+│   │   ├── matrix.h
+│   │   ├── meter.cc
+│   │   ├── meter.h
+│   │   ├── model.cc
+│   │   ├── model.h
+│   │   ├── productquantizer.cc
+│   │   ├── productquantizer.h
+│   │   ├── quantmatrix.cc
+│   │   ├── quantmatrix.h
+│   │   ├── real.h
+│   │   ├── utils.cc
+│   │   ├── utils.h
+│   │   ├── vector.cc
+│   │   └── vector.h
+│   ├── tests
+│   │   └── fetch_test_data.sh
+│   ├── webassembly
+│   │   ├── doc
+│   │   │   └── examples
+│   │   │       ├── misc.html
+│   │   │       ├── predict.html
+│   │   │       ├── train_supervised.html
+│   │   │       └── train_unsupervised.html
+│   │   ├── fasttext.js
+│   │   ├── fasttext_wasm.cc
+│   │   └── README.md
+│   ├── website
+│   │   ├── blog
+│   │   │   ├── 2016-08-18-blog-post.md
+│   │   │   ├── 2017-05-02-blog-post.md
+│   │   │   ├── 2017-10-02-blog-post.md
+│   │   │   └── 2019-06-25-blog-post.md
+│   │   ├── core
+│   │   │   └── Footer.js
+│   │   ├── package.json
+│   │   ├── pages
+│   │   │   └── en
+│   │   │       └── index.js
+│   │   ├── README.md
+│   │   ├── sidebars.json
+│   │   ├── siteConfig.js
+│   │   └── static
+│   │       ├── docs
+│   │       │   └── en
+│   │       │       └── html
+│   │       │           ├── annotated.html
+│   │       │           ├── annotated_dup.js
+│   │       │           ├── args_8cc.html
+│   │       │           ├── args_8h.html
+│   │       │           ├── args_8h.js
+│   │       │           ├── args_8h_source.html
+│   │       │           ├── bc_s.png
+│   │       │           ├── bdwn.png
+│   │       │           ├── classes.html
+│   │       │           ├── classfasttext_1_1Args.html
+│   │       │           ├── classfasttext_1_1Args.js
+│   │       │           ├── classfasttext_1_1Args-members.html
+│   │       │           ├── classfasttext_1_1Dictionary.html
+│   │       │           ├── classfasttext_1_1Dictionary.js
+│   │       │           ├── classfasttext_1_1Dictionary-members.html
+│   │       │           ├── classfasttext_1_1FastText.html
+│   │       │           ├── classfasttext_1_1FastText.js
+│   │       │           ├── classfasttext_1_1FastText-members.html
+│   │       │           ├── classfasttext_1_1Matrix.html
+│   │       │           ├── classfasttext_1_1Matrix.js
+│   │       │           ├── classfasttext_1_1Matrix-members.html
+│   │       │           ├── classfasttext_1_1Model.html
+│   │       │           ├── classfasttext_1_1Model.js
+│   │       │           ├── classfasttext_1_1Model-members.html
+│   │       │           ├── classfasttext_1_1ProductQuantizer.html
+│   │       │           ├── classfasttext_1_1ProductQuantizer.js
+│   │       │           ├── classfasttext_1_1ProductQuantizer-members.html
+│   │       │           ├── classfasttext_1_1QMatrix.html
+│   │       │           ├── classfasttext_1_1QMatrix.js
+│   │       │           ├── classfasttext_1_1QMatrix-members.html
+│   │       │           ├── classfasttext_1_1Vector.html
+│   │       │           ├── classfasttext_1_1Vector.js
+│   │       │           ├── classfasttext_1_1Vector-members.html
+│   │       │           ├── closed.png
+│   │       │           ├── dictionary_8cc.html
+│   │       │           ├── dictionary_8h.html
+│   │       │           ├── dictionary_8h.js
+│   │       │           ├── dictionary_8h_source.html
+│   │       │           ├── dir_68267d1309a1af8e8297ef4c3efbcdba.html
+│   │       │           ├── dir_68267d1309a1af8e8297ef4c3efbcdba.js
+│   │       │           ├── doc.png
+│   │       │           ├── doxygen.css
+│   │       │           ├── doxygen.png
+│   │       │           ├── dynsections.js
+│   │       │           ├── fasttext_8cc.html
+│   │       │           ├── fasttext_8h.html
+│   │       │           ├── fasttext_8h.js
+│   │       │           ├── fasttext_8h_source.html
+│   │       │           ├── favicon.png
+│   │       │           ├── files.html
+│   │       │           ├── files.js
+│   │       │           ├── folderclosed.png
+│   │       │           ├── folderopen.png
+│   │       │           ├── functions.html
+│   │       │           ├── functions_0x7e.html
+│   │       │           ├── functions_b.html
+│   │       │           ├── functions_c.html
+│   │       │           ├── functions_d.html
+│   │       │           ├── functions_dup.js
+│   │       │           ├── functions_e.html
+│   │       │           ├── functions_f.html
+│   │       │           ├── functions_func.html
+│   │       │           ├── functions_g.html
+│   │       │           ├── functions_h.html
+│   │       │           ├── functions_i.html
+│   │       │           ├── functions_k.html
+│   │       │           ├── functions_l.html
+│   │       │           ├── functions_m.html
+│   │       │           ├── functions_n.html
+│   │       │           ├── functions_o.html
+│   │       │           ├── functions_p.html
+│   │       │           ├── functions_q.html
+│   │       │           ├── functions_r.html
+│   │       │           ├── functions_s.html
+│   │       │           ├── functions_t.html
+│   │       │           ├── functions_u.html
+│   │       │           ├── functions_v.html
+│   │       │           ├── functions_vars.html
+│   │       │           ├── functions_w.html
+│   │       │           ├── functions_z.html
+│   │       │           ├── globals.html
+│   │       │           ├── globals_defs.html
+│   │       │           ├── globals_func.html
+│   │       │           ├── index.html
+│   │       │           ├── jquery.js
+│   │       │           ├── main_8cc.html
+│   │       │           ├── main_8cc.js
+│   │       │           ├── matrix_8cc.html
+│   │       │           ├── matrix_8h.html
+│   │       │           ├── matrix_8h_source.html
+│   │       │           ├── menu.js
+│   │       │           ├── menudata.js
+│   │       │           ├── model_8cc.html
+│   │       │           ├── model_8h.html
+│   │       │           ├── model_8h.js
+│   │       │           ├── model_8h_source.html
+│   │       │           ├── namespacefasttext.html
+│   │       │           ├── namespacefasttext.js
+│   │       │           ├── namespacefasttext_1_1utils.html
+│   │       │           ├── namespacemembers.html
+│   │       │           ├── namespacemembers_enum.html
+│   │       │           ├── namespacemembers_func.html
+│   │       │           ├── namespacemembers_type.html
+│   │       │           ├── namespaces.html
+│   │       │           ├── namespaces.js
+│   │       │           ├── nav_f.png
+│   │       │           ├── nav_g.png
+│   │       │           ├── nav_h.png
+│   │       │           ├── navtree.css
+│   │       │           ├── navtree.js
+│   │       │           ├── navtreedata.js
+│   │       │           ├── navtreeindex0.js
+│   │       │           ├── navtreeindex1.js
+│   │       │           ├── open.png
+│   │       │           ├── productquantizer_8cc.html
+│   │       │           ├── productquantizer_8cc.js
+│   │       │           ├── productquantizer_8h.html
+│   │       │           ├── productquantizer_8h_source.html
+│   │       │           ├── qmatrix_8cc.html
+│   │       │           ├── qmatrix_8h.html
+│   │       │           ├── qmatrix_8h_source.html
+│   │       │           ├── real_8h.html
+│   │       │           ├── real_8h.js
+│   │       │           ├── real_8h_source.html
+│   │       │           ├── resize.js
+│   │       │           ├── search
+│   │       │           │   ├── all_0.html
+│   │       │           │   ├── all_0.js
+│   │       │           │   ├── all_1.html
+│   │       │           │   ├── all_1.js
+│   │       │           │   ├── all_10.html
+│   │       │           │   ├── all_10.js
+│   │       │           │   ├── all_11.html
+│   │       │           │   ├── all_11.js
+│   │       │           │   ├── all_12.html
+│   │       │           │   ├── all_12.js
+│   │       │           │   ├── all_13.html
+│   │       │           │   ├── all_13.js
+│   │       │           │   ├── all_14.html
+│   │       │           │   ├── all_14.js
+│   │       │           │   ├── all_15.html
+│   │       │           │   ├── all_15.js
+│   │       │           │   ├── all_16.html
+│   │       │           │   ├── all_16.js
+│   │       │           │   ├── all_17.html
+│   │       │           │   ├── all_17.js
+│   │       │           │   ├── all_2.html
+│   │       │           │   ├── all_2.js
+│   │       │           │   ├── all_3.html
+│   │       │           │   ├── all_3.js
+│   │       │           │   ├── all_4.html
+│   │       │           │   ├── all_4.js
+│   │       │           │   ├── all_5.html
+│   │       │           │   ├── all_5.js
+│   │       │           │   ├── all_6.html
+│   │       │           │   ├── all_6.js
+│   │       │           │   ├── all_7.html
+│   │       │           │   ├── all_7.js
+│   │       │           │   ├── all_8.html
+│   │       │           │   ├── all_8.js
+│   │       │           │   ├── all_9.html
+│   │       │           │   ├── all_9.js
+│   │       │           │   ├── all_a.html
+│   │       │           │   ├── all_a.js
+│   │       │           │   ├── all_b.html
+│   │       │           │   ├── all_b.js
+│   │       │           │   ├── all_c.html
+│   │       │           │   ├── all_c.js
+│   │       │           │   ├── all_d.html
+│   │       │           │   ├── all_d.js
+│   │       │           │   ├── all_e.html
+│   │       │           │   ├── all_e.js
+│   │       │           │   ├── all_f.html
+│   │       │           │   ├── all_f.js
+│   │       │           │   ├── classes_0.html
+│   │       │           │   ├── classes_0.js
+│   │       │           │   ├── classes_1.html
+│   │       │           │   ├── classes_1.js
+│   │       │           │   ├── classes_2.html
+│   │       │           │   ├── classes_2.js
+│   │       │           │   ├── classes_3.html
+│   │       │           │   ├── classes_3.js
+│   │       │           │   ├── classes_4.html
+│   │       │           │   ├── classes_4.js
+│   │       │           │   ├── classes_5.html
+│   │       │           │   ├── classes_5.js
+│   │       │           │   ├── classes_6.html
+│   │       │           │   ├── classes_6.js
+│   │       │           │   ├── classes_7.html
+│   │       │           │   ├── classes_7.js
+│   │       │           │   ├── classes_8.html
+│   │       │           │   ├── classes_8.js
+│   │       │           │   ├── close.png
+│   │       │           │   ├── defines_0.html
+│   │       │           │   ├── defines_0.js
+│   │       │           │   ├── defines_1.html
+│   │       │           │   ├── defines_1.js
+│   │       │           │   ├── defines_2.html
+│   │       │           │   ├── defines_2.js
+│   │       │           │   ├── defines_3.html
+│   │       │           │   ├── defines_3.js
+│   │       │           │   ├── enums_0.html
+│   │       │           │   ├── enums_0.js
+│   │       │           │   ├── enums_1.html
+│   │       │           │   ├── enums_1.js
+│   │       │           │   ├── enums_2.html
+│   │       │           │   ├── enums_2.js
+│   │       │           │   ├── enumvalues_0.html
+│   │       │           │   ├── enumvalues_0.js
+│   │       │           │   ├── enumvalues_1.html
+│   │       │           │   ├── enumvalues_1.js
+│   │       │           │   ├── enumvalues_2.html
+│   │       │           │   ├── enumvalues_2.js
+│   │       │           │   ├── enumvalues_3.html
+│   │       │           │   ├── enumvalues_3.js
+│   │       │           │   ├── enumvalues_4.html
+│   │       │           │   ├── enumvalues_4.js
+│   │       │           │   ├── enumvalues_5.html
+│   │       │           │   ├── enumvalues_5.js
+│   │       │           │   ├── files_0.html
+│   │       │           │   ├── files_0.js
+│   │       │           │   ├── files_1.html
+│   │       │           │   ├── files_1.js
+│   │       │           │   ├── files_2.html
+│   │       │           │   ├── files_2.js
+│   │       │           │   ├── files_3.html
+│   │       │           │   ├── files_3.js
+│   │       │           │   ├── files_4.html
+│   │       │           │   ├── files_4.js
+│   │       │           │   ├── files_5.html
+│   │       │           │   ├── files_5.js
+│   │       │           │   ├── files_6.html
+│   │       │           │   ├── files_6.js
+│   │       │           │   ├── files_7.html
+│   │       │           │   ├── files_7.js
+│   │       │           │   ├── files_8.html
+│   │       │           │   ├── files_8.js
+│   │       │           │   ├── functions_0.html
+│   │       │           │   ├── functions_0.js
+│   │       │           │   ├── functions_1.html
+│   │       │           │   ├── functions_1.js
+│   │       │           │   ├── functions_10.html
+│   │       │           │   ├── functions_10.js
+│   │       │           │   ├── functions_11.html
+│   │       │           │   ├── functions_11.js
+│   │       │           │   ├── functions_12.html
+│   │       │           │   ├── functions_12.js
+│   │       │           │   ├── functions_13.html
+│   │       │           │   ├── functions_13.js
+│   │       │           │   ├── functions_14.html
+│   │       │           │   ├── functions_14.js
+│   │       │           │   ├── functions_15.html
+│   │       │           │   ├── functions_15.js
+│   │       │           │   ├── functions_16.html
+│   │       │           │   ├── functions_16.js
+│   │       │           │   ├── functions_17.html
+│   │       │           │   ├── functions_17.js
+│   │       │           │   ├── functions_2.html
+│   │       │           │   ├── functions_2.js
+│   │       │           │   ├── functions_3.html
+│   │       │           │   ├── functions_3.js
+│   │       │           │   ├── functions_4.html
+│   │       │           │   ├── functions_4.js
+│   │       │           │   ├── functions_5.html
+│   │       │           │   ├── functions_5.js
+│   │       │           │   ├── functions_6.html
+│   │       │           │   ├── functions_6.js
+│   │       │           │   ├── functions_7.html
+│   │       │           │   ├── functions_7.js
+│   │       │           │   ├── functions_8.html
+│   │       │           │   ├── functions_8.js
+│   │       │           │   ├── functions_9.html
+│   │       │           │   ├── functions_9.js
+│   │       │           │   ├── functions_a.html
+│   │       │           │   ├── functions_a.js
+│   │       │           │   ├── functions_b.html
+│   │       │           │   ├── functions_b.js
+│   │       │           │   ├── functions_c.html
+│   │       │           │   ├── functions_c.js
+│   │       │           │   ├── functions_d.html
+│   │       │           │   ├── functions_d.js
+│   │       │           │   ├── functions_e.html
+│   │       │           │   ├── functions_e.js
+│   │       │           │   ├── functions_f.html
+│   │       │           │   ├── functions_f.js
+│   │       │           │   ├── mag_sel.png
+│   │       │           │   ├── namespaces_0.html
+│   │       │           │   ├── namespaces_0.js
+│   │       │           │   ├── nomatches.html
+│   │       │           │   ├── search.css
+│   │       │           │   ├── search.js
+│   │       │           │   ├── search_l.png
+│   │       │           │   ├── search_m.png
+│   │       │           │   ├── search_r.png
+│   │       │           │   ├── searchdata.js
+│   │       │           │   ├── typedefs_0.html
+│   │       │           │   ├── typedefs_0.js
+│   │       │           │   ├── typedefs_1.html
+│   │       │           │   ├── typedefs_1.js
+│   │       │           │   ├── variables_0.html
+│   │       │           │   ├── variables_0.js
+│   │       │           │   ├── variables_1.html
+│   │       │           │   ├── variables_1.js
+│   │       │           │   ├── variables_10.html
+│   │       │           │   ├── variables_10.js
+│   │       │           │   ├── variables_11.html
+│   │       │           │   ├── variables_11.js
+│   │       │           │   ├── variables_12.html
+│   │       │           │   ├── variables_12.js
+│   │       │           │   ├── variables_13.html
+│   │       │           │   ├── variables_13.js
+│   │       │           │   ├── variables_2.html
+│   │       │           │   ├── variables_2.js
+│   │       │           │   ├── variables_3.html
+│   │       │           │   ├── variables_3.js
+│   │       │           │   ├── variables_4.html
+│   │       │           │   ├── variables_4.js
+│   │       │           │   ├── variables_5.html
+│   │       │           │   ├── variables_5.js
+│   │       │           │   ├── variables_6.html
+│   │       │           │   ├── variables_6.js
+│   │       │           │   ├── variables_7.html
+│   │       │           │   ├── variables_7.js
+│   │       │           │   ├── variables_8.html
+│   │       │           │   ├── variables_8.js
+│   │       │           │   ├── variables_9.html
+│   │       │           │   ├── variables_9.js
+│   │       │           │   ├── variables_a.html
+│   │       │           │   ├── variables_a.js
+│   │       │           │   ├── variables_b.html
+│   │       │           │   ├── variables_b.js
+│   │       │           │   ├── variables_c.html
+│   │       │           │   ├── variables_c.js
+│   │       │           │   ├── variables_d.html
+│   │       │           │   ├── variables_d.js
+│   │       │           │   ├── variables_e.html
+│   │       │           │   ├── variables_e.js
+│   │       │           │   ├── variables_f.html
+│   │       │           │   └── variables_f.js
+│   │       │           ├── splitbar.png
+│   │       │           ├── structfasttext_1_1entry.html
+│   │       │           ├── structfasttext_1_1entry.js
+│   │       │           ├── structfasttext_1_1entry-members.html
+│   │       │           ├── structfasttext_1_1Node.html
+│   │       │           ├── structfasttext_1_1Node.js
+│   │       │           ├── structfasttext_1_1Node-members.html
+│   │       │           ├── sync_off.png
+│   │       │           ├── sync_on.png
+│   │       │           ├── tab_a.png
+│   │       │           ├── tab_b.png
+│   │       │           ├── tab_h.png
+│   │       │           ├── tab_s.png
+│   │       │           ├── tabs.css
+│   │       │           ├── utils_8cc.html
+│   │       │           ├── utils_8cc.js
+│   │       │           ├── utils_8h.html
+│   │       │           ├── utils_8h.js
+│   │       │           ├── utils_8h_source.html
+│   │       │           ├── vector_8cc.html
+│   │       │           ├── vector_8cc.js
+│   │       │           ├── vector_8h.html
+│   │       │           ├── vector_8h.js
+│   │       │           └── vector_8h_source.html
+│   │       ├── fasttext.css
+│   │       ├── img
+│   │       │   ├── authors
+│   │       │   │   ├── armand_joulin.jpg
+│   │       │   │   ├── christian_puhrsch.png
+│   │       │   │   ├── edouard_grave.jpeg
+│   │       │   │   ├── piotr_bojanowski.jpg
+│   │       │   │   └── tomas_mikolov.jpg
+│   │       │   ├── blog
+│   │       │   │   ├── 2016-08-18-blog-post-img1.png
+│   │       │   │   ├── 2016-08-18-blog-post-img2.png
+│   │       │   │   ├── 2017-05-02-blog-post-img1.jpg
+│   │       │   │   ├── 2017-05-02-blog-post-img2.jpg
+│   │       │   │   └── 2017-10-02-blog-post-img1.png
+│   │       │   ├── cbo_vs_skipgram.png
+│   │       │   ├── fasttext-icon-api.png
+│   │       │   ├── fasttext-icon-bg-web.png
+│   │       │   ├── fasttext-icon-color-square.png
+│   │       │   ├── fasttext-icon-color-web.png
+│   │       │   ├── fasttext-icon-faq.png
+│   │       │   ├── fasttext-icon-tutorial.png
+│   │       │   ├── fasttext-icon-white-web.png
+│   │       │   ├── fasttext-logo-color-web.png
+│   │       │   ├── fasttext-logo-white-web.png
+│   │       │   ├── logo-color.png
+│   │       │   ├── model-black.png
+│   │       │   ├── model-blue.png
+│   │       │   ├── model-red.png
+│   │       │   ├── ogimage.png
+│   │       │   └── oss_logo.png
+│   │       └── tabber.js
+│   ├── wikifil.pl
+│   └── word-vector-example.sh
+├── fasttext_models.bat
 ├── finLabelGen.py
 ├── LICENSE
 ├── maori_dict.txt
@@ -108,10 +674,54 @@
 │   │           └── tokenizerBilstmSize3.pickle
 │   └── mbert
 │       ├── lowerCase
-│       │   └── fullSize
-│       │       └── 2022-07-04_14-12-24
+│       │   ├── fullSize
+│       │   │   └── 2022-07-04_14-12-24
+│       │   │       ├── m_bert_hf_out
+│       │   │       │   ├── checkpoint-13156
+│       │   │       │   │   ├── config.json
+│       │   │       │   │   ├── optimizer.pt
+│       │   │       │   │   ├── pytorch_model.bin
+│       │   │       │   │   ├── rng_state.pth
+│       │   │       │   │   ├── scheduler.pt
+│       │   │       │   │   ├── trainer_state.json
+│       │   │       │   │   └── training_args.bin
+│       │   │       │   ├── checkpoint-26312
+│       │   │       │   │   ├── config.json
+│       │   │       │   │   ├── optimizer.pt
+│       │   │       │   │   ├── pytorch_model.bin
+│       │   │       │   │   ├── rng_state.pth
+│       │   │       │   │   ├── scheduler.pt
+│       │   │       │   │   ├── trainer_state.json
+│       │   │       │   │   └── training_args.bin
+│       │   │       │   ├── checkpoint-39468
+│       │   │       │   │   ├── config.json
+│       │   │       │   │   ├── optimizer.pt
+│       │   │       │   │   ├── pytorch_model.bin
+│       │   │       │   │   ├── rng_state.pth
+│       │   │       │   │   ├── scheduler.pt
+│       │   │       │   │   ├── trainer_state.json
+│       │   │       │   │   └── training_args.bin
+│       │   │       │   ├── checkpoint-52624
+│       │   │       │   │   ├── config.json
+│       │   │       │   │   ├── optimizer.pt
+│       │   │       │   │   ├── pytorch_model.bin
+│       │   │       │   │   ├── rng_state.pth
+│       │   │       │   │   ├── scheduler.pt
+│       │   │       │   │   ├── trainer_state.json
+│       │   │       │   │   └── training_args.bin
+│       │   │       │   └── runs
+│       │   │       │       └── Jul04_14-12-24_hasel-artemis
+│       │   │       │           ├── 1656900746.5299132
+│       │   │       │           │   └── events.out.tfevents.1656900746.hasel-artemis.20308.1
+│       │   │       │           └── events.out.tfevents.1656900746.hasel-artemis.20308.0
+│       │   │       └── model
+│       │   │           ├── config.json
+│       │   │           ├── pytorch_model.bin
+│       │   │           └── training_args.bin
+│       │   └── size2
+│       │       └── 2022-07-29_20-12-52
 │       │           ├── m_bert_hf_out
-│       │           │   ├── checkpoint-13156
+│       │           │   ├── checkpoint-113053
 │       │           │   │   ├── config.json
 │       │           │   │   ├── optimizer.pt
 │       │           │   │   ├── pytorch_model.bin
@@ -119,7 +729,7 @@
 │       │           │   │   ├── scheduler.pt
 │       │           │   │   ├── trainer_state.json
 │       │           │   │   └── training_args.bin
-│       │           │   ├── checkpoint-26312
+│       │           │   ├── checkpoint-226106
 │       │           │   │   ├── config.json
 │       │           │   │   ├── optimizer.pt
 │       │           │   │   ├── pytorch_model.bin
@@ -127,7 +737,7 @@
 │       │           │   │   ├── scheduler.pt
 │       │           │   │   ├── trainer_state.json
 │       │           │   │   └── training_args.bin
-│       │           │   ├── checkpoint-39468
+│       │           │   ├── checkpoint-339159
 │       │           │   │   ├── config.json
 │       │           │   │   ├── optimizer.pt
 │       │           │   │   ├── pytorch_model.bin
@@ -135,7 +745,7 @@
 │       │           │   │   ├── scheduler.pt
 │       │           │   │   ├── trainer_state.json
 │       │           │   │   └── training_args.bin
-│       │           │   ├── checkpoint-52624
+│       │           │   ├── checkpoint-452212
 │       │           │   │   ├── config.json
 │       │           │   │   ├── optimizer.pt
 │       │           │   │   ├── pytorch_model.bin
@@ -144,10 +754,10 @@
 │       │           │   │   ├── trainer_state.json
 │       │           │   │   └── training_args.bin
 │       │           │   └── runs
-│       │           │       └── Jul04_14-12-24_hasel-artemis
-│       │           │           ├── 1656900746.5299132
-│       │           │           │   └── events.out.tfevents.1656900746.hasel-artemis.20308.1
-│       │           │           └── events.out.tfevents.1656900746.hasel-artemis.20308.0
+│       │           │       └── Jul29_20-12-52_hasel-artemis
+│       │           │           ├── 1659082379.0244522
+│       │           │           │   └── events.out.tfevents.1659082379.hasel-artemis.363578.1
+│       │           │           └── events.out.tfevents.1659082379.hasel-artemis.363578.0
 │       │           └── model
 │       │               ├── config.json
 │       │               ├── pytorch_model.bin
@@ -174,18 +784,62 @@
 │       │   │           ├── pytorch_model.bin
 │       │   │           └── training_args.bin
 │       │   └── size2
-│       │       └── 2022-06-27_02-10-43
-│       │           └── m_bert_hf_out
-│       │               └── runs
-│       │                   └── Jun27_02-10-43_DESKTOP-9GMA2KP
-│       │                       ├── 1656252643.8292477
-│       │                       │   └── events.out.tfevents.1656252643.DESKTOP-9GMA2KP.24620.1
-│       │                       └── events.out.tfevents.1656252643.DESKTOP-9GMA2KP.24620.0
+│       │       ├── 2022-06-27_02-10-43
+│       │       │   └── m_bert_hf_out
+│       │       │       └── runs
+│       │       │           └── Jun27_02-10-43_DESKTOP-9GMA2KP
+│       │       │               ├── 1656252643.8292477
+│       │       │               │   └── events.out.tfevents.1656252643.DESKTOP-9GMA2KP.24620.1
+│       │       │               └── events.out.tfevents.1656252643.DESKTOP-9GMA2KP.24620.0
+│       │       └── 2022-07-26_03-05-27
+│       │           ├── m_bert_hf_out
+│       │           │   ├── checkpoint-113053
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   ├── checkpoint-226106
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   ├── checkpoint-339159
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   ├── checkpoint-452212
+│       │           │   │   ├── config.json
+│       │           │   │   ├── optimizer.pt
+│       │           │   │   ├── pytorch_model.bin
+│       │           │   │   ├── rng_state.pth
+│       │           │   │   ├── scheduler.pt
+│       │           │   │   ├── trainer_state.json
+│       │           │   │   └── training_args.bin
+│       │           │   └── runs
+│       │           │       └── Jul26_03-05-27_hasel-artemis
+│       │           │           ├── 1658761532.7444751
+│       │           │           │   └── events.out.tfevents.1658761532.hasel-artemis.3252254.1
+│       │           │           └── events.out.tfevents.1658761532.hasel-artemis.3252254.0
+│       │           └── model
+│       │               ├── config.json
+│       │               ├── pytorch_model.bin
+│       │               └── training_args.bin
 │       └── tokenizer
 │           ├── special_tokens_map.json
 │           ├── tokenizer.json
 │           ├── tokenizer_config.json
 │           └── vocab.txt
+├── modelTest.py
 ├── README.md
 ├── semiAutoTestSetGen.py
 ├── size2LabelGen.py
@@ -224,4 +878,4 @@
     ├── webapi.py
     └── website.py
 
-57 directories, 167 files
+114 directories, 764 files
