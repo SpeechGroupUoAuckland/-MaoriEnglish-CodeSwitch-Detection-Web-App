@@ -67,7 +67,7 @@ current_datetime = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
 from transformers import EarlyStoppingCallback
 
 training_args = TrainingArguments(  num_train_epochs=4,
-                                    per_device_train_batch_size=1024, # Approximately 23 GB 
+                                    per_device_train_batch_size=75,
                                     overwrite_output_dir=True,
                                     learning_rate=8e-6,
                                     output_dir=output_base_path+current_datetime+"/m_bert_hf_out/",
