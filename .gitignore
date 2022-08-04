@@ -5,6 +5,7 @@
 maori_dict.txt
 models/
 wandb/
+embeddingTraining/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
