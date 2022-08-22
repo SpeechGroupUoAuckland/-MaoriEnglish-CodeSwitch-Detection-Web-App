@@ -294,7 +294,7 @@ st.markdown(f'<div style="display:flex;justify-content:flex-start;align-items:ce
 
 title = st.title('English Māori Code-switching Point Detection Tool')
 
-user_input = st.session_state['cleanText'](st.text_area("This tool detects the code-switching point of English and Māori.", placeholder="Start typing here...", height=200, max_chars=2500, help="English and Māori only.\n\nThe maximum number of characters is 2500.\n\nNon Ascii and non Māori characters will be ignored."))
+user_input = st.session_state['cleanText'](st.text_area("This tool detects the code-switching point of English and Māori.", placeholder="Start typing here...", height=200, max_chars=2500, help="English and Māori only.\n\nThe maximum number of characters is 2500.\n\nNon Ascii and non Māori characters will be ignored.")).replace('-', ' ')
 
 with st.container():
     col1, col2 = st.columns([1,1])
