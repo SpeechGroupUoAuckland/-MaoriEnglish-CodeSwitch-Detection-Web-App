@@ -98,14 +98,16 @@ if NO_INIT:
         text = text.replace('a. m', 'a.m').replace('p. m', 'p.m')
         return text.strip()
 
+    def listCmp(a:list, b:list) -> bool:
+        return abs(a[1] - b[1]) < 0.05 and abs(a[2] - b[2]) < 0.05
+
+
     ### BiLSTM model ###
     #### Detect the code switching point in a dynamic window
     def sentenceCategory(sentence, padding_length, tokenizer, loaded_model):
         seq = tokenizer.texts_to_sequences([sentence])
         padded = pad_sequences(seq, maxlen=padding_length)
-        predict = loaded_model.predict(padded) 
-        classw = np.argmax(predict,axis=1)
-        return int(classw[0])
+        return list(loaded_model.predict(padded, verbose=0)[0])
 
     def detectCodeSwitchingPointDynamicWindowVersion(x, w, tokenizer, loaded_model):
         p = w
@@ -123,35 +125,21 @@ if NO_INIT:
         if end < 1:
             return []
 
-        elif end < 2:
+        elif end == 1:
             if re.search(u'[āēīōūĀĒĪŌŪ]', x):
-                return [1]
+                return [[0, 1, 0]]
             elif re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-                return [2]
+                return [[0, 0, 1]]
             else:
                 return [sentenceCategory(x, p, tokenizer, loaded_model)]
 
         elif end == 2:
-            if not re.search(u'[āēīōūĀĒĪŌŪ]', x):
-                tmp_result = sentenceCategory(x, p, tokenizer, loaded_model)
-                if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-                    return [1, 1]
-                elif tmp_result == 2:
-                    return [2, 2]
-                else:
-                    if sentenceCategory(words_list[0], p, tokenizer, loaded_model) == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', words_list[0]):
-                        return [1, 2]
-                    else:
-                        return [2, 1]
+            tmp_result_list = sentenceCategory(x, p, tokenizer, loaded_model)
+            tmp_result = np.argmax(tmp_result_list)
+            if tmp_result == 1 and not re.search(u'[āēīōūĀĒĪŌŪ]', x) and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
+                return [tmp_result_list, tmp_result_list]
             else:
-                tmp_char_0 = re.search(u'[āēīōūĀĒĪŌŪ]', words_list[0])
-                tmp_char_1 = re.search(u'[āēīōūĀĒĪŌŪ]', words_list[1])
-                if tmp_char_0 and tmp_char_1:
-                    return [1, 1]
-                if tmp_char_0 and not tmp_char_1:
-                    return [1, 2]
-                else:
-                    return [2, 1]
+                return detectCodeSwitchingPointDynamicWindowVersion(words_list[0], 1, tokenizer, loaded_model) + detectCodeSwitchingPointDynamicWindowVersion(words_list[1], 1, tokenizer, loaded_model)
         
         else:
             result = []
@@ -162,12 +150,13 @@ if NO_INIT:
                     w = end - ptr
                 else:
                     pass
-
-                tmp_result = sentenceCategory(" ".join(this_window), p, tokenizer, loaded_model)
-                if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)):
-                    result.extend([1 for _ in range(w)])
+                
+                tmp_result_list = list(sentenceCategory(" ".join(this_window), p, tokenizer, loaded_model))
+                tmp_result = np.argmax(tmp_result_list)
+                if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)) and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
+                    result.extend([tmp_result_list for _ in range(w)])
                 elif tmp_result == 2 and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
-                    result += [2 for _ in range(w)]
+                    result += [tmp_result_list for _ in range(w)]
                 else:
                     if w >= 4 and w % 2 == 0:
                         result += detectCodeSwitchingPointDynamicWindowVersion(" ".join(this_window), w-2, tokenizer, loaded_model)
@@ -181,10 +170,10 @@ if NO_INIT:
 
     ### MBERT model ###
     @torch.no_grad()
-    def sentenceCategoryMbertVersion(text: str, model) -> int:
+    def sentenceCategoryMbertVersion(text: str, model):
         tokenized_text = mbert_tokenizer(text, padding="longest", truncation=True, return_tensors='pt')
         prediction = model(input_ids=tokenized_text["input_ids"], attention_mask=tokenized_text["attention_mask"], token_type_ids=tokenized_text["token_type_ids"])
-        return prediction.logits.detach().cpu().numpy().argmax()
+        return list(torch.nn.functional.softmax(prediction.logits, dim=-1).detach().cpu().numpy()[0])
 
     def detectCodeSwitchingPointMbertVersion(x: str, w: int, model) -> list():
         words_list = x.split()
@@ -203,31 +192,19 @@ if NO_INIT:
 
         elif end == 1:
             if re.search(u'[āēīōūĀĒĪŌŪ]', x):
-                return [1]
+                return [[0, 1, 0]]
             elif re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-                return [2]
+                return [[0, 0, 1]]
             else:
                 return [sentenceCategoryMbertVersion(x, model)]
 
         elif end == 2:
-            if not re.search(u'[āēīōūĀĒĪŌŪ]', x):
-                tmp_result = sentenceCategoryMbertVersion(x, model)
-                if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-                    return [1, 1]
-                elif tmp_result == 2:
-                    return [2, 2]
-                else:
-                    if sentenceCategoryMbertVersion(words_list[0], model) == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', words_list[0]):
-                        return [1, 2]
-                    else:
-                        return [2, 1]
+            tmp_result_list = sentenceCategoryMbertVersion(x, model)
+            tmp_result = np.argmax(tmp_result_list)
+            if tmp_result == 1 and not re.search(u'[āēīōūĀĒĪŌŪ]', x) and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
+                return [tmp_result_list, tmp_result_list]
             else:
-                if re.search(u'[āēīōūĀĒĪŌŪ]', words_list[0]) and re.search(u'[āēīōūĀĒĪŌŪ]', words_list[1]):
-                    return [1, 1]
-                if re.search(u'[āēīōūĀĒĪŌŪ]', words_list[0]) and not re.search(u'[āēīōūĀĒĪŌŪ]', words_list[1]):
-                    return [1, 2]
-                else:
-                    return [2, 1]
+                return detectCodeSwitchingPointMbertVersion(words_list[0], 1, model) + detectCodeSwitchingPointMbertVersion(words_list[1], 1, model)
         
         else:
             result = []
@@ -238,10 +215,12 @@ if NO_INIT:
                     w = end - ptr
                 else:
                     pass
-                if sentenceCategoryMbertVersion(" ".join(this_window), model) == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)):
-                    result.extend([1 for _ in range(w)])
-                elif sentenceCategoryMbertVersion(" ".join(this_window), model) == 2 and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
-                    result += [2 for _ in range(w)]
+                tmp_result_list = list(sentenceCategoryMbertVersion(" ".join(this_window), model))
+                tmp_result = np.argmax(tmp_result_list)
+                if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)) and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
+                    result.extend([tmp_result_list for _ in range(w)])
+                elif tmp_result == 2 and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
+                    result += [tmp_result_list for _ in range(w)]
                 else:
                     if w >= 4 and w % 2 == 0:
                         result += detectCodeSwitchingPointMbertVersion(" ".join(this_window), w-2, model)
@@ -280,8 +259,10 @@ if NO_INIT:
 
     st.session_state['dropdown_models'] = ['Size 2 BiLSTM', 'Size 2 BiLSTM Lower', 'Size 3 BiLSTM', 'Size 3 BiLSTM Lower', 'Full Size BiLSTM', 'Full Size BiLSTM Lower', 'Full Size MBERT', 'Full Size MBERT Lower']
     st.session_state['selected_model'] = 'Size 3 BiLSTM Lower'
-    st.session_state['user_input'] = ''
     st.session_state['result'] = ''
+
+    st.session_state['round'] = np.round
+    st.session_state['listCmp'] = listCmp
 
 # End of initialization #
 
@@ -313,7 +294,7 @@ st.markdown(f'<div style="display:flex;justify-content:flex-start;align-items:ce
 
 title = st.title('English Māori Code-switching Point Detection Tool')
 
-user_input = st.session_state['cleanText'](st.text_area("This tool detects the code-switching point of English and Māori.", value=st.session_state['user_input'], placeholder="Start typing here...", height=200, max_chars=2500, help="English and Māori only.\n\nThe maximum number of characters is 2500.\n\nNon Ascii and non Māori characters will be ignored."))
+user_input = st.session_state['cleanText'](st.text_area("This tool detects the code-switching point of English and Māori.", placeholder="Start typing here...", height=200, max_chars=2500, help="English and Māori only.\n\nThe maximum number of characters is 2500.\n\nNon Ascii and non Māori characters will be ignored."))
 
 with st.container():
     col1, col2 = st.columns([1,1])
@@ -321,8 +302,8 @@ with st.container():
     
     col2.markdown("###### ​", unsafe_allow_html=True)
 
-    st.session_state['user_input'] = user_input if user_input else ' '
-    detection_button = True if col2.button("Detect", disabled=user_input == '') else False
+    # detection_button = True if col2.button("Detect", disabled=user_input == '') else False
+    detection_button = True if col2.button("Detect") else False
     user_input = user_input if user_input else ' '
     
     if detection_button:
@@ -352,29 +333,32 @@ with st.container():
             st.error("Please select a model.") ## NEVER HAPPENS
         
         ## 1 for Māori, 2 for English
-        result = result if result else [' ']
+        result = result if result else []
+        result = [list(item) for item in result]
         tmp_user_input_list = st.session_state['cleanText'](user_input).split()
-        tmp_user_input_list = tmp_user_input_list if tmp_user_input_list else [' ']
-        tmp_result_str = ""
-        tmp_result_till_last_one = result[:-1]
-        tmp_result_last_one = result[-1]
-        tmp_user_input_last_one = tmp_user_input_list[-1]
-        for index, item in enumerate(tmp_result_till_last_one):
-            if item == 1:
-                tmp_result_str += f'<label style="padding-right:5px;background-color:yellow;font-weight:550">{tmp_user_input_list[index]}</label>'
-            elif item == 2:
-                tmp_result_str += f'<label style="padding-right:5px;">{tmp_user_input_list[index]}</label>'
+        if len(tmp_user_input_list) != 0:
+            tmp_result_str = ""
+            tmp_result_till_last_one = result[:-1]
+            tmp_result_last_one = result[-1]
+            tmp_user_input_last_one = tmp_user_input_list[-1]
+            for index, item in enumerate(tmp_result_till_last_one):
+                if st.session_state['listCmp'](item, [0, 1, 0]):
+                    tmp_result_str += f'<label style="padding-right:5px;background-color:yellow;font-weight:550">{tmp_user_input_list[index]}[{item[1]:.2f},{item[2]:.2f}]</label>'
+                elif st.session_state['listCmp'](item, [0, 0, 1]):
+                    tmp_result_str += f'<label style="padding-right:5px;">{tmp_user_input_list[index]}[{item[1]:.2f},{item[2]:.2f}]</label>'
+                else:
+                    tmp_result_str += f'<label style="padding-right:5px;background-color:cyan;font-weight:350">{tmp_user_input_list[index]}[{item[1]:.2f},{item[2]:.2f}]</label>'
+            
+            if st.session_state['listCmp'](tmp_result_last_one, [0, 1, 0]):
+                tmp_result_str += f'<label style="background-color:yellow;font-weight:550">{tmp_user_input_last_one}[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</label>'
+            elif st.session_state['listCmp'](tmp_result_last_one, [0, 0, 1]):
+                tmp_result_str += f'<label>{tmp_user_input_last_one}[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</label>'
             else:
-                pass
-        
-        if tmp_result_last_one == 1:
-            tmp_result_str += f'<label style="background-color:yellow;font-weight:550">{tmp_user_input_last_one}</label>'
-        elif tmp_result_last_one == 2:
-            tmp_result_str += f'<label>{tmp_user_input_last_one}</label>'
+                tmp_result_str += f'<label style="padding-right:5px;background-color:cyan;font-weight:350">{tmp_user_input_list[-1]}[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</label>'
+            
+            st.session_state['result'] = tmp_result_str
         else:
-            pass
-        
-        st.session_state['result'] = tmp_result_str
+            st.session_state['result'] = ''
     
 st.markdown("---")
 st.markdown(f'#### Result:\n\n<div style="background-color:#f0f2f6;width:100%;height:120px;border-radius:3px;padding:16px;">{st.session_state["result"]}</div>', unsafe_allow_html=True)
