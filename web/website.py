@@ -259,7 +259,11 @@ if NO_INIT:
 
     st.session_state['dropdown_models'] = ['Size 2 BiLSTM', 'Size 2 BiLSTM Lower', 'Size 3 BiLSTM', 'Size 3 BiLSTM Lower', 'Full Size BiLSTM', 'Full Size BiLSTM Lower', 'Full Size MBERT', 'Full Size MBERT Lower']
     st.session_state['selected_model'] = 'Size 3 BiLSTM Lower'
-    st.session_state['result'] = ''
+    
+    st.session_state['prediction_result'] = []
+    st.session_state['display_result'] = ''
+    st.session_state['user_input'] = ''
+    st.session_state['verbose_mode'] = False
 
     st.session_state['round'] = np.round
     st.session_state['listCmp'] = listCmp
@@ -300,69 +304,108 @@ with st.container():
     col1, col2 = st.columns([1,1])
     selected_model = col1.selectbox("Select a model:", st.session_state['dropdown_models'], index=3)
     
-    col2.markdown("###### ​", unsafe_allow_html=True)
+    col2.markdown("​", unsafe_allow_html=True)
 
     # detection_button = True if col2.button("Detect", disabled=user_input == '') else False
-    detection_button = True if col2.button("Detect") else False
+    detection_button = col2.button("Detect")
     user_input = user_input if user_input else ' '
     
-    if detection_button:
-        st.session_state['selected_model'] = selected_model
-
-        if selected_model == 'Size 2 BiLSTM':
-            result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input, 2, st.session_state['size_2_bilstm_tokenizer'], st.session_state['size_2_bilstm_model'])
-        elif selected_model == 'Size 2 BiLSTM Lower':
-            result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input.lower(), 2, st.session_state['size_2_bilstm_lower_tokenizer'], st.session_state['size_2_bilstm_lower_model'])
-        
-        elif selected_model == 'Size 3 BiLSTM':
-            result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input, 3, st.session_state['size_3_bilstm_tokenizer'], st.session_state['size_3_bilstm_model'])
-        elif selected_model == 'Size 3 BiLSTM Lower':
-            result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input.lower(), 3, st.session_state['size_3_bilstm_lower_tokenizer'], st.session_state['size_3_bilstm_lower_model'])
-
-        elif selected_model == 'Full Size BiLSTM':
-            result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input, 250, st.session_state['full_size_bilstm_tokenizer'], st.session_state['full_size_bilstm_model'])
-        elif selected_model == 'Full Size BiLSTM Lower':
-            result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input.lower(), 250, st.session_state['full_size_bilstm_lower_tokenizer'], st.session_state['full_size_bilstm_lower_model'])
-        
-        elif selected_model == 'Full Size MBERT':
-            result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input, 4, st.session_state['full_size_mbert_model'])
-        elif selected_model == 'Full Size MBERT Lower':
-            result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input.lower(), 4, st.session_state['full_size_mbert_lower_model'])
-        
-        else:
-            st.error("Please select a model.") ## NEVER HAPPENS
-        
-        ## 1 for Māori, 2 for English
-        result = result if result else []
-        result = [list(item) for item in result]
-        tmp_user_input_list = st.session_state['cleanText'](user_input).split()
-        if len(tmp_user_input_list) != 0:
-            tmp_result_str = ""
-            tmp_result_till_last_one = result[:-1]
-            tmp_result_last_one = result[-1]
-            tmp_user_input_last_one = tmp_user_input_list[-1]
-            for index, item in enumerate(tmp_result_till_last_one):
-                if st.session_state['listCmp'](item, [0, 1, 0]):
-                    tmp_result_str += f'<label style="padding-right:5px;background-color:yellow;font-weight:550">{tmp_user_input_list[index]}[{item[1]:.2f},{item[2]:.2f}]</label>'
-                elif st.session_state['listCmp'](item, [0, 0, 1]):
-                    tmp_result_str += f'<label style="padding-right:5px;">{tmp_user_input_list[index]}[{item[1]:.2f},{item[2]:.2f}]</label>'
-                else:
-                    tmp_result_str += f'<label style="padding-right:5px;background-color:cyan;font-weight:350">{tmp_user_input_list[index]}[{item[1]:.2f},{item[2]:.2f}]</label>'
-            
-            if st.session_state['listCmp'](tmp_result_last_one, [0, 1, 0]):
-                tmp_result_str += f'<label style="background-color:yellow;font-weight:550">{tmp_user_input_last_one}[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</label>'
-            elif st.session_state['listCmp'](tmp_result_last_one, [0, 0, 1]):
-                tmp_result_str += f'<label>{tmp_user_input_last_one}[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</label>'
-            else:
-                tmp_result_str += f'<label style="padding-right:5px;background-color:cyan;font-weight:350">{tmp_user_input_list[-1]}[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</label>'
-            
-            st.session_state['result'] = tmp_result_str
-        else:
-            st.session_state['result'] = ''
-    
 st.markdown("---")
-st.markdown(f'#### Result:\n\n<div style="background-color:#f0f2f6;width:100%;height:120px;border-radius:3px;padding:16px;">{st.session_state["result"]}</div>', unsafe_allow_html=True)
+with st.container():
+    col1, col2 = st.columns([1,1])
+    col1.markdown("### Result:", unsafe_allow_html=True)
 
+    verbose_mode = col2.checkbox(label='Verbose', value=False, help='Display the result in verbose mode.\n\nA possibility list will be displayed for each vocabulary word on the top.\n\nThe first entry is the possibility of the word being Māori, the second is the possibility of the word being English, and 1 - sum(possibility list) is the possibility of bilingual.\n\nIf a word is more likely to be Māori, it will be rendered dark yellow, otherwise, it will be rendered grey. It will be rendered in a cyan colour if the possibility is equal.')
+
+if detection_button:
+    st.session_state['selected_model'] = selected_model
+
+    if selected_model == 'Size 2 BiLSTM':
+        prediction_result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input, 2, st.session_state['size_2_bilstm_tokenizer'], st.session_state['size_2_bilstm_model'])
+    elif selected_model == 'Size 2 BiLSTM Lower':
+        prediction_result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input.lower(), 2, st.session_state['size_2_bilstm_lower_tokenizer'], st.session_state['size_2_bilstm_lower_model'])
+    
+    elif selected_model == 'Size 3 BiLSTM':
+        prediction_result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input, 3, st.session_state['size_3_bilstm_tokenizer'], st.session_state['size_3_bilstm_model'])
+    elif selected_model == 'Size 3 BiLSTM Lower':
+        prediction_result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input.lower(), 3, st.session_state['size_3_bilstm_lower_tokenizer'], st.session_state['size_3_bilstm_lower_model'])
+
+    elif selected_model == 'Full Size BiLSTM':
+        prediction_result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input, 250, st.session_state['full_size_bilstm_tokenizer'], st.session_state['full_size_bilstm_model'])
+    elif selected_model == 'Full Size BiLSTM Lower':
+        result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input.lower(), 250, st.session_state['full_size_bilstm_lower_tokenizer'], st.session_state['full_size_bilstm_lower_model'])
+    
+    elif selected_model == 'Full Size MBERT':
+        prediction_result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input, 4, st.session_state['full_size_mbert_model'])
+    elif selected_model == 'Full Size MBERT Lower':
+        prediction_result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input.lower(), 4, st.session_state['full_size_mbert_lower_model'])
+    
+    else:
+        st.error("Please select a model.") ## NEVER HAPPENS
+    
+    ## 1 for Māori, 2 for English
+    prediction_result = prediction_result if prediction_result else []
+    prediction_result = [list(item) for item in prediction_result]
+    st.session_state['prediction_result'] = prediction_result
+
+    st.session_state['user_input'] = st.session_state['cleanText'](user_input)
+
+    tmp_user_input_list = st.session_state['user_input'].split()
+    if len(tmp_user_input_list) != 0:
+        tmp_result_str = ""
+        tmp_result_till_last_one = prediction_result[:-1]
+        tmp_result_last_one = prediction_result[-1]
+        tmp_user_input_last_one = tmp_user_input_list[-1]
+        for index, item in enumerate(tmp_result_till_last_one):
+            if st.session_state['listCmp'](item, [0, 1, 0]):
+                tmp_result_str += f'<ruby style="padding-right:5px;background-color:yellow;font-weight:550"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+            elif st.session_state['listCmp'](item, [0, 0, 1]):
+                tmp_result_str += f'<ruby style="padding-right:5px;"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+            else:
+                tmp_result_str += f'<ruby style="padding-right:5px;background-color:{"#cccc00" if item[1] > item[2] else "#bfbfbf" if item[1] < item[2] else "cyan"};font-weight:350"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        
+        if st.session_state['listCmp'](tmp_result_last_one, [0, 1, 0]):
+            tmp_result_str += f'<ruby style="background-color:yellow;font-weight:550"><label>{tmp_user_input_last_one}</label>' + (f'<rt>[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        elif st.session_state['listCmp'](tmp_result_last_one, [0, 0, 1]):
+            tmp_result_str += f'<ruby><label>{tmp_user_input_last_one}</label>' + (f'<rt>[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        else:
+            tmp_result_str += f'<ruby style="padding-right:5px;background-color:{"#cccc00" if item[1] > item[2] else "#bfbfbf" if item[1] < item[2] else "cyan"};font-weight:350"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        
+        st.session_state['display_result'] = tmp_result_str
+    else:
+        st.session_state['display_result'] = ''
+
+if verbose_mode != st.session_state['verbose_mode']:
+    tmp_user_input_list = st.session_state['user_input'].split()
+    if len(tmp_user_input_list) != 0:
+        tmp_result_str = ""
+        tmp_result_till_last_one = st.session_state['prediction_result'][:-1]
+        tmp_result_last_one = st.session_state['prediction_result'][-1]
+        tmp_user_input_last_one = tmp_user_input_list[-1]
+        for index, item in enumerate(tmp_result_till_last_one):
+            if st.session_state['listCmp'](item, [0, 1, 0]):
+                tmp_result_str += f'<ruby style="padding-right:5px;background-color:yellow;font-weight:550"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+            elif st.session_state['listCmp'](item, [0, 0, 1]):
+                tmp_result_str += f'<ruby style="padding-right:5px;"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+            else:
+                tmp_result_str += f'<ruby style="padding-right:5px;background-color:{"#cccc00" if item[1] > item[2] else "#bfbfbf" if item[1] < item[2] else "cyan"};font-weight:350"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        
+        if st.session_state['listCmp'](tmp_result_last_one, [0, 1, 0]):
+            tmp_result_str += f'<ruby style="background-color:yellow;font-weight:550"><label>{tmp_user_input_last_one}</label>' + (f'<rt>[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        elif st.session_state['listCmp'](tmp_result_last_one, [0, 0, 1]):
+            tmp_result_str += f'<ruby><label>{tmp_user_input_last_one}</label>' + (f'<rt>[{tmp_result_last_one[1]:.2f},{tmp_result_last_one[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        else:
+            tmp_result_str += f'<ruby style="padding-right:5px;background-color:{"#cccc00" if item[1] > item[2] else "#bfbfbf" if item[1] < item[2] else "cyan"};font-weight:350"><label>{tmp_user_input_list[index]}</label>' + (f'<rt>[{item[1]:.2f},{item[2]:.2f}]</rt>' if verbose_mode else '') + '</ruby>'
+        
+        st.session_state['display_result'] = tmp_result_str
+    else:
+        st.session_state['display_result'] = ''
+else:
+    pass
+
+st.session_state['verbose_mode'] = verbose_mode
+
+st.markdown(f'<div style="background-color:#f0f2f6;width:100%;height:120px;border-radius:3px;padding:16px;">{st.session_state["display_result"]}</div>', unsafe_allow_html=True)
 st.markdown("---")
 st.markdown("For more information of the definition of code switch detection and the models used, please visit: https://openreview.net/forum?id=rAxl_GibSWq")
 
