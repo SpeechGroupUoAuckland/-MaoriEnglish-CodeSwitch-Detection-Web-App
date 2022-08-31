@@ -314,7 +314,7 @@ with st.container():
     col1, col2 = st.columns([1,1])
     col1.markdown("### Result:", unsafe_allow_html=True)
 
-    verbose_mode = col2.checkbox(label='To display probability of language detection', value=False, help='Display the result in verbose mode.\n\nA probability list will be displayed for each vocabulary word on the top.\n\nThe first entry is the probability of the word being Māori, the second is the probability of the word being English, and 1 - sum(probability list) is the probability of bilingual.\n\nIf a word is more likely to be Māori, it will be rendered dark yellow, otherwise, it will be rendered grey. It will be rendered in a cyan colour if the probability is equal.')
+    verbose_mode = col2.checkbox(label='To display probability of language detection', value=False, help='Display the result in verbose mode.\n\nA probability list will be displayed for each vocabulary word on the top.\n\nThe first entry is the probability of the word being Māori, the second is the probability of the word being English, and 1 - sum(probability list) is the probability of being ambiguous.\n\nIf a word is more likely to be Māori, it will be rendered dark yellow, otherwise, it will be rendered grey. It will be rendered in a cyan colour if the probability is equal.')
 
 if detection_button:
     st.session_state['selected_model'] = selected_model
