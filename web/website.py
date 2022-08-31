@@ -98,9 +98,8 @@ if NO_INIT:
         text = text.replace('a. m', 'a.m').replace('p. m', 'p.m')
         return text.strip()
 
-    def listCmp(a:list, b:list) -> bool:
-        return abs(a[1] - b[1]) < 0.05 and abs(a[2] - b[2]) < 0.05
-
+    def listCmp(a:list, b:list) -> bool: # Todo: fix this after literature review
+        return abs(a[1] - b[1]) <= 0.05 and abs(a[2] - b[2]) <= 0.05
 
     ### BiLSTM model ###
     #### Detect the code switching point in a dynamic window
@@ -315,7 +314,7 @@ with st.container():
     col1, col2 = st.columns([1,1])
     col1.markdown("### Result:", unsafe_allow_html=True)
 
-    verbose_mode = col2.checkbox(label='Verbose', value=False, help='Display the result in verbose mode.\n\nA possibility list will be displayed for each vocabulary word on the top.\n\nThe first entry is the possibility of the word being Māori, the second is the possibility of the word being English, and 1 - sum(possibility list) is the possibility of bilingual.\n\nIf a word is more likely to be Māori, it will be rendered dark yellow, otherwise, it will be rendered grey. It will be rendered in a cyan colour if the possibility is equal.')
+    verbose_mode = col2.checkbox(label='To display probability of language detection', value=False, help='Display the result in verbose mode.\n\nA probability list will be displayed for each vocabulary word on the top.\n\nThe first entry is the probability of the word being Māori, the second is the probability of the word being English, and 1 - sum(probability list) is the probability of bilingual.\n\nIf a word is more likely to be Māori, it will be rendered dark yellow, otherwise, it will be rendered grey. It will be rendered in a cyan colour if the probability is equal.')
 
 if detection_button:
     st.session_state['selected_model'] = selected_model
