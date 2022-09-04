@@ -98,6 +98,7 @@ if NO_INIT:
         text = text.replace('a. m', 'a.m').replace('p. m', 'p.m')
         return text.strip()
 
+    ### Compare the list 
     def listCmp(a:list, b:list) -> bool: # Todo: fix this after literature review
         return abs(a[1] - b[1]) <= 0.05 and abs(a[2] - b[2]) <= 0.05
 
