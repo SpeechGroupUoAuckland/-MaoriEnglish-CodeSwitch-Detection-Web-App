@@ -35,6 +35,12 @@ size_3_bilstm_lower_tokenizer_path = base_folder+'tokenizerBilstmSize3Lower.pick
 full_size_mbert_model_path = base_folder+'mbert'
 full_size_mbert_lower_model_path = base_folder+'mbertLower'
 
+size_2_mbert_model_path = base_folder+'mbertSize2'
+size_2_mbert_lower_model_path = base_folder+'mbertSize2Lower'
+
+size_3_mbert_model_path = base_folder+'mbertSize3'
+size_3_mbert_lower_model_path = base_folder+'mbertSize3Lower'
+
 mbert_tokenizer_path = base_folder+'tokenizerMbert'
 # End of parameters #
 
@@ -71,6 +77,20 @@ full_size_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained
 for param in full_size_mbert_lower_model.parameters():
     param.requires_grad_(False)
 
+size_2_mbert_model = AutoModelForSequenceClassification.from_pretrained(size_2_mbert_model_path, num_labels=3)
+for param in size_2_mbert_model.parameters():
+    param.requires_grad_(False)
+size_2_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(size_2_mbert_lower_model_path, num_labels=3)
+for param in size_2_mbert_lower_model.parameters():
+    param.requires_grad_(False)
+
+size_3_mbert_model = AutoModelForSequenceClassification.from_pretrained(size_3_mbert_model_path, num_labels=3)
+for param in size_3_mbert_model.parameters():
+    param.requires_grad_(False)
+size_3_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(size_3_mbert_lower_model_path, num_labels=3)
+for param in size_3_mbert_lower_model.parameters():
+    param.requires_grad_(False)
+
 mbert_tokenizer = AutoTokenizer.from_pretrained(mbert_tokenizer_path)
 # End of load models #
 
@@ -93,14 +113,16 @@ def cleanText(text):
     text = text.replace('a. m', 'a.m').replace('p. m', 'p.m')
     return text.strip()
 
+## Compare the list 
+def listCmp(a:list, b:list) -> bool: # Todo: fix this after literature review
+    return abs(a[1] - b[1]) <= 0.05 and abs(a[2] - b[2]) <= 0.05
+
 ## BiLSTM model ##
 ### Detect the code switching point in a dynamic window
 def sentenceCategory(sentence, padding_length, tokenizer, loaded_model):
     seq = tokenizer.texts_to_sequences([sentence])
     padded = pad_sequences(seq, maxlen=padding_length)
-    predict = loaded_model.predict(padded, verbose = 0) 
-    classw = np.argmax(predict,axis=1)
-    return int(classw[0])
+    return list(loaded_model.predict(padded, verbose=0)[0])
 
 def detectCodeSwitchingPointDynamicWindowVersion(x, w, tokenizer, loaded_model):
     p = w
@@ -118,35 +140,21 @@ def detectCodeSwitchingPointDynamicWindowVersion(x, w, tokenizer, loaded_model):
     if end < 1:
         return []
 
-    elif end < 2:
+    elif end == 1:
         if re.search(u'[āēīōūĀĒĪŌŪ]', x):
-            return [1]
+            return [[0, 1, 0]]
         elif re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-            return [2]
+            return [[0, 0, 1]]
         else:
             return [sentenceCategory(x, p, tokenizer, loaded_model)]
 
     elif end == 2:
-        if not re.search(u'[āēīōūĀĒĪŌŪ]', x):
-            tmp_result = sentenceCategory(x, p, tokenizer, loaded_model)
-            if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-                return [1, 1]
-            elif tmp_result == 2:
-                return [2, 2]
-            else:
-                if sentenceCategory(words_list[0], p, tokenizer, loaded_model) == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', words_list[0]):
-                    return [1, 2]
-                else:
-                    return [2, 1]
+        tmp_result_list = sentenceCategory(x, p, tokenizer, loaded_model)
+        tmp_result = np.argmax(tmp_result_list)
+        if tmp_result == 1 and not re.search(u'[āēīōūĀĒĪŌŪ]', x) and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
+            return [tmp_result_list, tmp_result_list]
         else:
-            tmp_char_0 = re.search(u'[āēīōūĀĒĪŌŪ]', words_list[0])
-            tmp_char_1 = re.search(u'[āēīōūĀĒĪŌŪ]', words_list[1])
-            if tmp_char_0 and tmp_char_1:
-                return [1, 1]
-            if tmp_char_0 and not tmp_char_1:
-                return [1, 2]
-            else:
-                return [2, 1]
+            return detectCodeSwitchingPointDynamicWindowVersion(words_list[0], 1, tokenizer, loaded_model) + detectCodeSwitchingPointDynamicWindowVersion(words_list[1], 1, tokenizer, loaded_model)
     
     else:
         result = []
@@ -157,12 +165,13 @@ def detectCodeSwitchingPointDynamicWindowVersion(x, w, tokenizer, loaded_model):
                 w = end - ptr
             else:
                 pass
-
-            tmp_result = sentenceCategory(" ".join(this_window), p, tokenizer, loaded_model)
-            if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)):
-                result.extend([1 for _ in range(w)])
+            
+            tmp_result_list = list(sentenceCategory(" ".join(this_window), p, tokenizer, loaded_model))
+            tmp_result = np.argmax(tmp_result_list)
+            if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)) and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
+                result.extend([tmp_result_list for _ in range(w)])
             elif tmp_result == 2 and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
-                result += [2 for _ in range(w)]
+                result += [tmp_result_list for _ in range(w)]
             else:
                 if w >= 4 and w % 2 == 0:
                     result += detectCodeSwitchingPointDynamicWindowVersion(" ".join(this_window), w-2, tokenizer, loaded_model)
@@ -176,10 +185,10 @@ def detectCodeSwitchingPointDynamicWindowVersion(x, w, tokenizer, loaded_model):
 
 ## MBERT model ##
 @torch.no_grad()
-def sentenceCategoryMbertVersion(text: str, model) -> int:
+def sentenceCategoryMbertVersion(text: str, model):
     tokenized_text = mbert_tokenizer(text, padding="longest", truncation=True, return_tensors='pt')
     prediction = model(input_ids=tokenized_text["input_ids"], attention_mask=tokenized_text["attention_mask"], token_type_ids=tokenized_text["token_type_ids"])
-    return prediction.logits.detach().cpu().numpy().argmax()
+    return list(torch.nn.functional.softmax(prediction.logits, dim=-1).detach().cpu().numpy()[0])
 
 def detectCodeSwitchingPointMbertVersion(x: str, w: int, model) -> list():
     words_list = x.split()
@@ -198,31 +207,19 @@ def detectCodeSwitchingPointMbertVersion(x: str, w: int, model) -> list():
 
     elif end == 1:
         if re.search(u'[āēīōūĀĒĪŌŪ]', x):
-            return [1]
+            return [[0, 1, 0]]
         elif re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-            return [2]
+            return [[0, 0, 1]]
         else:
             return [sentenceCategoryMbertVersion(x, model)]
 
     elif end == 2:
-        if not re.search(u'[āēīōūĀĒĪŌŪ]', x):
-            tmp_result = sentenceCategoryMbertVersion(x, model)
-            if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
-                return [1, 1]
-            elif tmp_result == 2:
-                return [2, 2]
-            else:
-                if sentenceCategoryMbertVersion(words_list[0], model) == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', words_list[0]):
-                    return [1, 2]
-                else:
-                    return [2, 1]
+        tmp_result_list = sentenceCategoryMbertVersion(x, model)
+        tmp_result = np.argmax(tmp_result_list)
+        if tmp_result == 1 and not re.search(u'[āēīōūĀĒĪŌŪ]', x) and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', x):
+            return [tmp_result_list, tmp_result_list]
         else:
-            if re.search(u'[āēīōūĀĒĪŌŪ]', words_list[0]) and re.search(u'[āēīōūĀĒĪŌŪ]', words_list[1]):
-                return [1, 1]
-            if re.search(u'[āēīōūĀĒĪŌŪ]', words_list[0]) and not re.search(u'[āēīōūĀĒĪŌŪ]', words_list[1]):
-                return [1, 2]
-            else:
-                return [2, 1]
+            return detectCodeSwitchingPointMbertVersion(words_list[0], 1, model) + detectCodeSwitchingPointMbertVersion(words_list[1], 1, model)
     
     else:
         result = []
@@ -233,10 +230,12 @@ def detectCodeSwitchingPointMbertVersion(x: str, w: int, model) -> list():
                 w = end - ptr
             else:
                 pass
-            if sentenceCategoryMbertVersion(" ".join(this_window), model) == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)):
-                result.extend([1 for _ in range(w)])
-            elif sentenceCategoryMbertVersion(" ".join(this_window), model) == 2 and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
-                result += [2 for _ in range(w)]
+            tmp_result_list = list(sentenceCategoryMbertVersion(" ".join(this_window), model))
+            tmp_result = np.argmax(tmp_result_list)
+            if tmp_result == 1 and not re.search(u'[bBcCdDfFgGjJlLqQsSvVxXyYzZ]', " ".join(this_window)) and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
+                result.extend([tmp_result_list for _ in range(w)])
+            elif tmp_result == 2 and not re.search(u'[āēīōūĀĒĪŌŪ]', " ".join(this_window)):
+                result += [tmp_result_list for _ in range(w)]
             else:
                 if w >= 4 and w % 2 == 0:
                     result += detectCodeSwitchingPointMbertVersion(" ".join(this_window), w-2, model)
@@ -247,22 +246,19 @@ def detectCodeSwitchingPointMbertVersion(x: str, w: int, model) -> list():
             ptr += w
         return result
 ## End of Mbert model ##
-
-def transfrom(a: list) -> list:
-    for index, item in enumerate(a):
-        if item == 1:
-            a[index] = 'M'
-        elif item == 2:
-            a[index] = 'P'
-        else:
-            a[index] = 'U'
-    return a
 # End of functions #
 
 # Test
 def test_model(model_name, window_size):
     model = globals()[f'{model_name}_model']
-    tokenizer = globals()[f'{model_name}_tokenizer']
+
+    if 'mbert' in model_name:
+        def detectWrapper(text, wondow_size, model):
+            return detectCodeSwitchingPointMbertVersion(text, wondow_size, model)
+    else:
+        tokenizer = globals()[f'{model_name}_tokenizer']
+        def detectWrapper(text, wondow_size, model):
+            return detectCodeSwitchingPointDynamicWindowVersion(text, wondow_size, tokenizer, model)
 
     lower_flag = True if 'lower' in model_name else False
 
@@ -276,7 +272,8 @@ def test_model(model_name, window_size):
 
     for row in test.itertuples():
         text = row.text.lower() if lower_flag else row.text
-        predict = transfrom(detectCodeSwitchingPointDynamicWindowVersion(text, window_size, tokenizer, model))
+        prediction_result = detectWrapper(text, window_size, model)
+        predict = [ 'M' if np.argmax(item[1:], axis=0) == 0 else 'E' for item in prediction_result ]
         real = list(row.label)
         if len(predict) == len(real):
             wrong_sentence = False
@@ -310,12 +307,20 @@ def test_model(model_name, window_size):
         json.dump(wrong_sentence_list, f)
         f.write('\n}')
 
+test_model('size_2_bilstm', 2)
+test_model('size_2_bilstm_lower', 2)
+
+test_model('size_3_bilstm', 3)
+test_model('size_3_bilstm_lower', 3)
 
 test_model('full_size_bilstm', 250)
 test_model('full_size_bilstm_lower', 250)
 
-test_model('size_2_bilstm', 2)
-test_model('size_2_bilstm_lower', 2)
+test_model('size_2_mbert', 2)
+test_model('size_2_mbert_lower', 2)
 
-test_model('size_3_bilstmd', 3)
-test_model('size_3_bilstm_lower', 3)
+test_model('size_3_mbert', 3)
+test_model('size_3_mbert_lower', 3)
+
+test_model('full_size_mbert', 4)
+test_model('full_size_mbert_lower', 4)
