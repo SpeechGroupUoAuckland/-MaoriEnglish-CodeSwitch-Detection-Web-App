@@ -40,6 +40,12 @@ if NO_INIT:
     full_size_mbert_model_path = 'models/mbert'
     full_size_mbert_lower_model_path = 'models/mbertLower'
 
+    size_2_mbert_model_path = 'models/mbertSize2'
+    size_2_mbert_lower_model_path = 'models/mbertSize2Lower'
+
+    size_3_mbert_model_path = 'models/mbertSize3'
+    size_3_mbert_lower_model_path = 'models/mbertSize3Lower'
+
     mbert_tokenizer_path = 'models/tokenizerMbert'
     ## End of parameters ##
 
@@ -74,6 +80,20 @@ if NO_INIT:
         param.requires_grad_(False)
     full_size_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(full_size_mbert_lower_model_path, num_labels=3)
     for param in full_size_mbert_lower_model.parameters():
+        param.requires_grad_(False)
+    
+    size_2_mbert_model = AutoModelForSequenceClassification.from_pretrained(size_2_mbert_model_path, num_labels=3)
+    for param in size_2_mbert_model.parameters():
+        param.requires_grad_(False)
+    size_2_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(size_2_mbert_lower_model_path, num_labels=3)
+    for param in size_2_mbert_lower_model.parameters():
+        param.requires_grad_(False)
+
+    size_3_mbert_model = AutoModelForSequenceClassification.from_pretrained(size_3_mbert_model_path, num_labels=3)
+    for param in size_3_mbert_model.parameters():
+        param.requires_grad_(False)
+    size_3_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(size_3_mbert_lower_model_path, num_labels=3)
+    for param in size_3_mbert_lower_model.parameters():
         param.requires_grad_(False)
 
     mbert_tokenizer = AutoTokenizer.from_pretrained(mbert_tokenizer_path)
@@ -252,12 +272,18 @@ if NO_INIT:
     st.session_state['full_size_mbert_model'] = full_size_mbert_model
     st.session_state['full_size_mbert_lower_model'] = full_size_mbert_lower_model
 
+    st.session_state['size_2_mbert_model'] = size_2_mbert_model
+    st.session_state['size_2_mbert_lower_model'] = size_2_mbert_lower_model
+
+    st.session_state['size_3_mbert_model'] = size_3_mbert_model
+    st.session_state['size_3_mbert_lower_model'] = size_3_mbert_lower_model
+
     st.session_state['cleanText'] = cleanText
     st.session_state['detectCodeSwitchingPointDynamicWindowVersion'] = detectCodeSwitchingPointDynamicWindowVersion
     st.session_state['detectCodeSwitchingPointMbertVersion'] = detectCodeSwitchingPointMbertVersion
     ## End of ST states ##
 
-    st.session_state['dropdown_models'] = ['Size 2 BiLSTM', 'Size 2 BiLSTM Lower', 'Size 3 BiLSTM', 'Size 3 BiLSTM Lower', 'Full Size BiLSTM', 'Full Size BiLSTM Lower', 'Full Size MBERT', 'Full Size MBERT Lower']
+    st.session_state['dropdown_models'] = ['Size 2 BiLSTM', 'Size 2 BiLSTM Lower', 'Size 3 BiLSTM', 'Size 3 BiLSTM Lower', 'Full Size BiLSTM', 'Full Size BiLSTM Lower', 'Size 2 MBERT', 'Size 2 MBERT Lower', 'Size 3 MBERT', 'Size 3 MBERT Lower', 'Full Size MBERT', 'Full Size MBERT Lower']
     st.session_state['selected_model'] = 'Size 3 BiLSTM Lower'
     
     st.session_state['prediction_result'] = []
@@ -334,6 +360,16 @@ if detection_button:
         prediction_result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input, 250, st.session_state['full_size_bilstm_tokenizer'], st.session_state['full_size_bilstm_model'])
     elif selected_model == 'Full Size BiLSTM Lower':
         result = st.session_state['detectCodeSwitchingPointDynamicWindowVersion'](user_input.lower(), 250, st.session_state['full_size_bilstm_lower_tokenizer'], st.session_state['full_size_bilstm_lower_model'])
+    
+    elif selected_model == 'Size 2 MBERT':
+        prediction_result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input, 2, st.session_state['size_2_mbert_model'])
+    elif selected_model == 'Size 2 MBERT Lower':
+        prediction_result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input.lower(), 2, st.session_state['size_2_mbert_lower_model'])
+    
+    elif selected_model == 'Size 3 MBERT':
+        prediction_result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input, 3, st.session_state['size_3_mbert_model'])
+    elif selected_model == 'Size 3 MBERT Lower':
+        prediction_result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input.lower(), 3, st.session_state['size_3_mbert_lower_model'])
     
     elif selected_model == 'Full Size MBERT':
         prediction_result = st.session_state['detectCodeSwitchingPointMbertVersion'](user_input, 4, st.session_state['full_size_mbert_model'])

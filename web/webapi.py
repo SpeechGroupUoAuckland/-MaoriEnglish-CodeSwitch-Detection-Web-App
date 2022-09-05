@@ -42,6 +42,12 @@ size_3_bilstm_lower_tokenizer_path = 'models/tokenizerBilstmSize3Lower.pickle'
 full_size_mbert_model_path = 'models/mbert'
 full_size_mbert_lower_model_path = 'models/mbertLower'
 
+size_2_mbert_model_path = 'models/mbertSize2'
+size_2_mbert_lower_model_path = 'models/mbertSize2Lower'
+
+size_3_mbert_model_path = 'models/mbertSize3'
+size_3_mbert_lower_model_path = 'models/mbertSize3Lower'
+
 mbert_tokenizer_path = 'models/tokenizerMbert'
 # End of parameters #
 
@@ -76,6 +82,20 @@ for param in full_size_mbert_model.parameters():
     param.requires_grad_(False)
 full_size_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(full_size_mbert_lower_model_path, num_labels=3)
 for param in full_size_mbert_lower_model.parameters():
+    param.requires_grad_(False)
+
+size_2_mbert_model = AutoModelForSequenceClassification.from_pretrained(size_2_mbert_model_path, num_labels=3)
+for param in size_2_mbert_model.parameters():
+    param.requires_grad_(False)
+size_2_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(size_2_mbert_lower_model_path, num_labels=3)
+for param in size_2_mbert_lower_model.parameters():
+    param.requires_grad_(False)
+
+size_3_mbert_model = AutoModelForSequenceClassification.from_pretrained(size_3_mbert_model_path, num_labels=3)
+for param in size_3_mbert_model.parameters():
+    param.requires_grad_(False)
+size_3_mbert_lower_model = AutoModelForSequenceClassification.from_pretrained(size_3_mbert_lower_model_path, num_labels=3)
+for param in size_3_mbert_lower_model.parameters():
     param.requires_grad_(False)
 
 mbert_tokenizer = AutoTokenizer.from_pretrained(mbert_tokenizer_path)
@@ -237,13 +257,15 @@ def detectCodeSwitchingPointMbertVersion(x: str, w: int, model) -> list():
 
 output_format = '''{<br/>"input": "Maori English Maori",<br/>"cleaned": "Maori English Maori",<br/>"labels": ["M", "E", "M"],<br/>"probability": [[1,0], [0,1], [1,0]]<br/>}'''
 
+avaliable_models = ['size_2_bilstm', 'size_2_bilstm_lower', 'size_3_bilstm', 'size_3_bilstm_lower', 'full_size_bilstm', 'full_size_bilstm_lower', 'size_2_mbert', 'size_2_mbert_lower', 'size_3_mbert', 'size_3_mbert_lower', 'full_size_mbert', 'full_size_mbert_lower']
+
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
     return redirect("https://aotearoavoices.nz/favicon.ico")
 
 @app.route('/getModel', methods=['GET'])
 def getModel():
-        return '<title>M/E CW Detection API</title>Avaliable Models are: size_2_bilstm, size_2_bilstm_lower, size_3_bilstm, size_3_bilstm_lower, full_size_bilstm, full_size_bilstm_lower, full_size_mbert, full_size_mbert_lower.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'
+        return '<title>M/E CW Detection API</title>Avaliable Models are: {}.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'.format(", ".join(avaliable_models))
 
 @app.route('/getInfo', methods=['GET'])
 def getInfo():
@@ -276,6 +298,16 @@ def detect():
             prediction_result = detectCodeSwitchingPointDynamicWindowVersion(cleaned_text, 250, full_size_bilstm_tokenizer, full_size_bilstm_model)
         elif model_name == "full_size_bilstm_lower":
             prediction_result = detectCodeSwitchingPointDynamicWindowVersion(cleaned_text.lower(), 250, full_size_bilstm_lower_tokenizer, full_size_bilstm_lower_model)
+        
+        elif model_name == "size_2_mbert":
+            prediction_result = detectCodeSwitchingPointMbertVersion(cleaned_text, 2, size_2_mbert_model)
+        elif model_name == "size_2_mbert_lower":
+            prediction_result = detectCodeSwitchingPointMbertVersion(cleaned_text.lower(), 2, size_2_mbert_lower_model)
+        
+        elif model_name == "size_3_mbert":
+            prediction_result = detectCodeSwitchingPointMbertVersion(cleaned_text, 3, size_3_mbert_model)
+        elif model_name == "size_3_mbert_lower":
+            prediction_result = detectCodeSwitchingPointMbertVersion(cleaned_text.lower(), 3, size_3_mbert_lower_model)
         
         elif model_name == "full_size_mbert":
             prediction_result = detectCodeSwitchingPointMbertVersion(cleaned_text, 4, full_size_mbert_model)
