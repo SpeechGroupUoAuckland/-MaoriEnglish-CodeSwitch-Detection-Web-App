@@ -1,3 +1,4 @@
+import sys
 import torch
 from transformers import AutoTokenizer
 from transformers import AutoModelForSequenceClassification
@@ -307,20 +308,30 @@ def test_model(model_name, window_size):
         json.dump(wrong_sentence_list, f)
         f.write('\n}')
 
-test_model('size_2_bilstm', 2)
-test_model('size_2_bilstm_lower', 2)
+def main():
+    args = sys.argv
+    if len(args) > 1:
+        args = args[1:]
+        if args[0] == '-h' or args[0] == '--help':
+            print('Usage: python3 modelTest.py [model_name] [window_size]')
+            print('Example: python3 modelTest.py mbert 5')
+        else:
+            test_model(args[0], int(args[1]))
+    else:
+        test_model('size_2_bilstm', 2)
+        test_model('size_2_bilstm_lower', 2)
 
-test_model('size_3_bilstm', 3)
-test_model('size_3_bilstm_lower', 3)
+        test_model('size_3_bilstm', 3)
+        test_model('size_3_bilstm_lower', 3)
 
-test_model('full_size_bilstm', 250)
-test_model('full_size_bilstm_lower', 250)
+        test_model('full_size_bilstm', 250)
+        test_model('full_size_bilstm_lower', 250)
 
-test_model('size_2_mbert', 2)
-test_model('size_2_mbert_lower', 2)
+        test_model('size_2_mbert', 2)
+        test_model('size_2_mbert_lower', 2)
 
-test_model('size_3_mbert', 3)
-test_model('size_3_mbert_lower', 3)
+        test_model('size_3_mbert', 3)
+        test_model('size_3_mbert_lower', 3)
 
-test_model('full_size_mbert', 4)
-test_model('full_size_mbert_lower', 4)
+        test_model('full_size_mbert', 4)
+        test_model('full_size_mbert_lower', 4)
