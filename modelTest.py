@@ -274,7 +274,7 @@ def test_model(model_name, window_size):
     for row in test.itertuples():
         text = row.text.lower() if lower_flag else row.text
         prediction_result = detectWrapper(text, window_size, model)
-        predict = [ 'M' if np.argmax(item[1:], axis=0) == 0 else 'E' for item in prediction_result ]
+        predict = [ 'M' if np.argmax(item[1:], axis=0) == 0 else 'P' for item in prediction_result ]
         real = list(row.label)
         if len(predict) == len(real):
             wrong_sentence = False
@@ -318,20 +318,25 @@ def main():
         else:
             test_model(args[0], int(args[1]))
     else:
-        test_model('size_2_bilstm', 2)
-        test_model('size_2_bilstm_lower', 2)
+        import multiprocessing
+        multiprocessing.freeze_support()
+        multiprocessing.set_start_method('spawn')
+        n_cores = multiprocessing.cpu_count() if multiprocessing.cpu_count() < 12 else 12
+        pool = multiprocessing.Pool(processes=n_cores)
+        pool.starmap(test_model, [
+            ('size_2_bilstm', 2),
+            ('size_2_bilstm_lower', 2),
+            ('size_3_bilstm', 3),
+            ('size_3_bilstm_lower', 3),
+            ('full_size_bilstm', 250),
+            ('full_size_bilstm_lower', 250),
+            ('size_2_mbert', 2),
+            ('size_2_mbert_lower', 2),
+            ('size_3_mbert', 3),
+            ('size_3_mbert_lower', 3),
+            ('full_size_mbert', 4),
+            ('full_size_mbert_lower', 4),
+        ])
 
-        test_model('size_3_bilstm', 3)
-        test_model('size_3_bilstm_lower', 3)
-
-        test_model('full_size_bilstm', 250)
-        test_model('full_size_bilstm_lower', 250)
-
-        test_model('size_2_mbert', 2)
-        test_model('size_2_mbert_lower', 2)
-
-        test_model('size_3_mbert', 3)
-        test_model('size_3_mbert_lower', 3)
-
-        test_model('full_size_mbert', 4)
-        test_model('full_size_mbert_lower', 4)
+if __name__ == '__main__':
+    main()
