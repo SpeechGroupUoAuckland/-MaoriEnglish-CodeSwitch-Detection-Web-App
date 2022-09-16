@@ -265,7 +265,8 @@ def favicon():
 
 @app.route('/getModel', methods=['GET'])
 def getModel():
-        return '<title>M/E CW Detection API</title>Avaliable Models are: {}.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'.format(", ".join(avaliable_models))
+        # return '<title>M/E CW Detection API</title>Avaliable Models are: {}.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'.format(", ".join(avaliable_models))
+        return jsonify({"models": avaliable_models, "usage": "At /getInfo page", "more information": "https://openreview.net/forum?id=rAxl_GibSWq"})
 
 @app.route('/getInfo', methods=['GET'])
 def getInfo():
@@ -328,5 +329,6 @@ def detect():
 
 if __name__ == '__main__':
     # Bind 127.0.0.1:8500, only accept connections from localhost
-    app.run(host='127.0.0.1', port=8500, debug=True)
+    # app.run(host='127.0.0.1', port=8500, debug=True)
+    app.run(host='0.0.0.0', port=8500, debug=True)
     
