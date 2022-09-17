@@ -19,7 +19,7 @@ export default function StartPage() {
   const lang = langStates.getState() as any
   const [uiSentenceList, setUiSentenceList] = useState<string[]>()
 
-  const [langState, setLangState] = useState<boolean>(true)
+  const [langState, setLangState] = useState<boolean>(lang?.global.lang === 'e')
 
   const [inputText, setInputText] = useState<string>('')
   const [models, setModels] = useState<string[]>([])
