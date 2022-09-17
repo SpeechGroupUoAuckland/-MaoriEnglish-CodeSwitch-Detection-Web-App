@@ -53,6 +53,7 @@ export default function StartPage() {
 
   function renderPrediction(result: Prediction | undefined, verbose: boolean) {
     const r = result ? result : undefined
+
     if (r) {
       const threshold = 0.95
 
@@ -61,104 +62,115 @@ export default function StartPage() {
       const pp = r.probability
       const p: any[] = []
 
-      const e: any[] = []
-
-      pp.forEach((item) => {
-        const tmpList: number[] = []
-        item.forEach((child: string) => {
-          tmpList.push(parseFloat(child))
-        })
-        p.push(tmpList)
-      })
-
-      if (verbose) {
-        tl.forEach((t, i) => {
-          if (p[i][0] >= threshold) {
-            e[i] = (
-              <ruby className="flex flex-col place-items-center bg-[#ffff00]">
-                <rp>(</rp>
-                <rt>[{pp[i].toString()}]</rt>
-                <rp>)</rp>
-                {t}
-              </ruby>
-            )
-          } else if (p[i][1] >= threshold) {
-            e[i] = (
-              <ruby className="flex flex-col place-items-center">
-                <rp>(</rp>
-                <rt>[{pp[i].toString()}]</rt>
-                <rp>)</rp>
-                {t}
-              </ruby>
-            )
-          } else if (p[i][0] > p[i][1]) {
-            e[i] = (
-              <ruby className="flex flex-col place-items-center bg-orange-300">
-                <rp>(</rp>
-                <rt>[{pp[i].toString()}]</rt>
-                <rp>)</rp>
-                {t}
-              </ruby>
-            )
-          } else if (p[i][1] > p[i][0]) {
-            e[i] = (
-              <ruby className="flex flex-col place-items-center bg-neutral-300">
-                <rp>(</rp>
-                <rt>[{pp[i].toString()}]</rt>
-                <rp>)</rp>
-                {t}
-              </ruby>
-            )
-          } else {
-            e[i] = (
-              <ruby className="flex flex-col place-items-center bg-cyan-300">
-                <rp>(</rp>
-                <rt>[{pp[i].toString()}]</rt>
-                <rp>)</rp>
-                {t}
-              </ruby>
-            )
-          }
-        })
+      // check if length of pp and tl is 0
+      if (
+        !tl ||
+        !pp ||
+        pp.length === 0 ||
+        tl.length === 0 ||
+        pp.length !== tl.length
+      ) {
+        return <div></div>
       } else {
-        tl.forEach((t, i) => {
-          if (p[i][0] >= threshold) {
-            e[i] = (
-              <div className="flex flex-col place-items-center bg-[#ffff00]">
-                {t}
-              </div>
-            )
-          } else if (p[i][1] >= threshold) {
-            e[i] = <div className="flex flex-col place-items-center">{t}</div>
-          } else if (p[i][0] > p[i][1]) {
-            e[i] = (
-              <div className="flex flex-col place-items-center bg-orange-300">
-                {t}
-              </div>
-            )
-          } else if (p[i][1] > p[i][0]) {
-            e[i] = (
-              <div className="flex flex-col place-items-center bg-neutral-300">
-                {t}
-              </div>
-            )
-          } else {
-            e[i] = (
-              <div className="flex flex-col place-items-center bg-cyan-300">
-                {t}
-              </div>
-            )
-          }
-        })
-      }
+        const e: any[] = []
 
-      return (
-        <div className="flex flex-row flex-wrap gap-1">
-          {e?.map((item: any, i: number) => (
-            <div key={i}>{item}</div>
-          ))}
-        </div>
-      )
+        pp.forEach((item) => {
+          const tmpList: number[] = []
+          item.forEach((child: string) => {
+            tmpList.push(parseFloat(child))
+          })
+          p.push(tmpList)
+        })
+
+        if (verbose) {
+          tl.forEach((t, i) => {
+            if (p[i][0] >= threshold) {
+              e[i] = (
+                <ruby className="flex flex-col place-items-center bg-[#ffff00]">
+                  <rp>(</rp>
+                  <rt>[{pp[i].toString()}]</rt>
+                  <rp>)</rp>
+                  {t}
+                </ruby>
+              )
+            } else if (p[i][1] >= threshold) {
+              e[i] = (
+                <ruby className="flex flex-col place-items-center">
+                  <rp>(</rp>
+                  <rt>[{pp[i].toString()}]</rt>
+                  <rp>)</rp>
+                  {t}
+                </ruby>
+              )
+            } else if (p[i][0] > p[i][1]) {
+              e[i] = (
+                <ruby className="flex flex-col place-items-center bg-orange-300">
+                  <rp>(</rp>
+                  <rt>[{pp[i].toString()}]</rt>
+                  <rp>)</rp>
+                  {t}
+                </ruby>
+              )
+            } else if (p[i][1] > p[i][0]) {
+              e[i] = (
+                <ruby className="flex flex-col place-items-center bg-neutral-300">
+                  <rp>(</rp>
+                  <rt>[{pp[i].toString()}]</rt>
+                  <rp>)</rp>
+                  {t}
+                </ruby>
+              )
+            } else {
+              e[i] = (
+                <ruby className="flex flex-col place-items-center bg-cyan-300">
+                  <rp>(</rp>
+                  <rt>[{pp[i].toString()}]</rt>
+                  <rp>)</rp>
+                  {t}
+                </ruby>
+              )
+            }
+          })
+        } else {
+          tl.forEach((t, i) => {
+            if (p[i][0] >= threshold) {
+              e[i] = (
+                <div className="flex flex-col place-items-center bg-[#ffff00]">
+                  {t}
+                </div>
+              )
+            } else if (p[i][1] >= threshold) {
+              e[i] = <div className="flex flex-col place-items-center">{t}</div>
+            } else if (p[i][0] > p[i][1]) {
+              e[i] = (
+                <div className="flex flex-col place-items-center bg-orange-300">
+                  {t}
+                </div>
+              )
+            } else if (p[i][1] > p[i][0]) {
+              e[i] = (
+                <div className="flex flex-col place-items-center bg-neutral-300">
+                  {t}
+                </div>
+              )
+            } else {
+              e[i] = (
+                <div className="flex flex-col place-items-center bg-cyan-300">
+                  {t}
+                </div>
+              )
+            }
+          })
+        }
+
+        return (
+          <div className="flex flex-row flex-wrap gap-1">
+            {e?.map((item: any, i: number) => (
+              <div key={i}>{item}</div>
+            ))}
+          </div>
+        )
+      }
     } else {
       return <div></div>
     }
@@ -254,10 +266,10 @@ export default function StartPage() {
                     console.log(rejected)
                   })
 
-                // setTimeout(() => {
-                //   setLoadingState(false)
-                // }, 2000)
-                setLoadingState(false)
+                setTimeout(() => {
+                  setLoadingState(false)
+                }, 600)
+                // setLoadingState(false)
               }}
             >
               {uiSentenceList ? uiSentenceList[4] : ''}
@@ -311,6 +323,11 @@ export default function StartPage() {
             anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             open={showVerboseInfo}
             autoHideDuration={6000}
+            ContentProps={{
+              sx: {
+                background: '#2288cc',
+              },
+            }}
             onClose={() => {
               setShowVerboseInfo(false)
             }}
