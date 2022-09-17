@@ -300,6 +300,8 @@ export default function StartPage() {
           <a
             href="https://openreview.net/forum?id=rAxl_GibSWq"
             className="text-sky-500"
+            target="_blank"
+            rel="noreferrer"
           >
             https://openreview.net/forum?id=rAxl_GibSWq
           </a>
