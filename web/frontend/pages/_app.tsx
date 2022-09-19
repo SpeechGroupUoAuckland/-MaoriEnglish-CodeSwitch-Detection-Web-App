@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import '../styles/globals.css'
+import App, { AppContext } from 'next/app'
 import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux'
 import langStates from '../util/langStates'
@@ -55,6 +56,17 @@ function MyApp({ Component, pageProps }: AppProps) {
       </footer>
     </Provider>
   )
+}
+
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  const appProps = await App.getInitialProps(appContext)
+  if (appContext.ctx.res?.statusCode === 404) {
+    appContext.ctx.res.writeHead(302, { Location: '/' })
+    appContext.ctx.res.end()
+    return
+  } else {
+    return { ...appProps }
+  }
 }
 
 export default MyApp
