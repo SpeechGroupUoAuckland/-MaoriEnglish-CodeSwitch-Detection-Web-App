@@ -263,6 +263,10 @@ avaliable_models = ['size_2_bilstm', 'size_2_bilstm_lower', 'size_3_bilstm', 'si
 def favicon():
     return redirect("https://aotearoavoices.nz/favicon.ico")
 
+@app.route('/robots.txt', methods=['GET'])
+def robots():
+    return 'User-agent: *\nDisallow: /'
+
 @app.route('/getModel', methods=['GET'])
 def getModel():
         # return '<title>M/E CW Detection API</title>Avaliable Models are: {}.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'.format(", ".join(avaliable_models))

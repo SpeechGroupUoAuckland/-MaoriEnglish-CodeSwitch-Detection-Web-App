@@ -14,7 +14,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <link rel="icon" href="https://aotearoavoices.nz/favicon.ico" />
       </Head>
       <header className="fixed top-0 left-0 right-0 flex flex-row items-center justify-between bg-gray-200 p-4 opacity-100">
-        <a href="https://www.auckland.ac.nz/" target="_blank" rel="noreferrer">
+        <a href="https://www.auckland.ac.nz/" target="_blank" rel="noopener noreferrer">
           <img
             src="https://blogs.auckland.ac.nz/files/2016/07/UOA-NT-HC-RGB-1dr6b6b.png"
             className="h-12"
@@ -30,7 +30,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <a
           href="https://speechresearch.auckland.ac.nz/"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
           <img
             src="https://avatars.githubusercontent.com/u/100390597"
@@ -47,7 +47,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             href="https://speechresearch.auckland.ac.nz/"
             target="_blank"
             className="font-bold text-blue-600"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             Speech Research Group @ UoA
           </a>
