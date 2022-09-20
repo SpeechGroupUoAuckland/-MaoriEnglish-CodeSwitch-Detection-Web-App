@@ -9,7 +9,7 @@
 #   /getInfo -> string The usage and the purpose of the API
 ###############################################################
 
-from flask import Flask, redirect, request, jsonify
+from flask import Flask, redirect, request, jsonify, Response
 from flask_restful import Api
 import re
 import pickle
@@ -265,7 +265,9 @@ def favicon():
 
 @app.route('/robots.txt', methods=['GET'])
 def robots():
-    return 'User-agent: *\nDisallow: /'
+    r = Response(response="User-Agent: *\nDisallow: /\n", status=200, mimetype="text/plain")
+    r.headers["Content-Type"] = "text/plain; charset=utf-8"
+    return r
 
 @app.route('/getModel', methods=['GET'])
 def getModel():
