@@ -32,6 +32,7 @@ export default function StartPage() {
   useEffect(() => {
     if (lang?.global.lang === undefined) {
       router.push('/')
+      return
     }
 
     if (lang?.global.lang === 'e') {
@@ -313,7 +314,7 @@ export default function StartPage() {
             href="https://openreview.net/forum?id=rAxl_GibSWq"
             className="text-sky-500"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             https://openreview.net/forum?id=rAxl_GibSWq
           </a>
