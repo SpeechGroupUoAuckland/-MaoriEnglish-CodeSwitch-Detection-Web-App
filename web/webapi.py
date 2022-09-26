@@ -20,8 +20,27 @@ import torch
 from transformers import AutoTokenizer
 from transformers import AutoModelForSequenceClassification
 
+from datetime import datetime
+import json
+
 app = Flask(__name__)
 api = Api(app)
+
+log = True
+log_path = 'webapi_log.jsonl'
+
+def logger(on=log, path=log_path):
+    if on:        
+        logDict = {}
+        logDict['time'] = datetime.now().isoformat()
+        logDict['ip'] = request.remote_addr
+        logDict['ua'] = request.headers.get('User-Agent')
+        logDict['method'] = request.method
+        logDict['path'] = request.path + '?' + request.query_string.decode('utf-8')
+        with open(path, 'a') as f:
+            f.write(json.dumps(logDict)+'\n')
+    else:
+        pass
 
 # Parameters #
 full_size_bilstm_model_path = 'models/bilstm.h5'
@@ -261,29 +280,35 @@ avaliable_models = ['size_2_bilstm', 'size_2_bilstm_lower', 'size_3_bilstm', 'si
 
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
+    logger(on=log, path=log_path)
     return redirect("https://aotearoavoices.nz/favicon.ico")
 
 @app.route('/robots.txt', methods=['GET'])
 def robots():
+    logger(on=log, path=log_path)
     r = Response(response="User-Agent: *\nDisallow: /\n", status=200, mimetype="text/plain")
     r.headers["Content-Type"] = "text/plain; charset=utf-8"
     return r
 
 @app.route('/getModel', methods=['GET'])
 def getModel():
-        # return '<title>M/E CW Detection API</title>Avaliable Models are: {}.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'.format(", ".join(avaliable_models))
-        return jsonify({"models": avaliable_models, "usage": "At /getInfo page", "more information": "https://openreview.net/forum?id=rAxl_GibSWq"})
+    logger(on=log, path=log_path)
+    # return '<title>M/E CW Detection API</title>Avaliable Models are: {}.<br/><br/>For more information, please visit <a href="./getInfo">getInfo</a>.<div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'.format(", ".join(avaliable_models))
+    return jsonify({"models": avaliable_models, "usage": "At /getInfo page", "more information": "https://openreview.net/forum?id=rAxl_GibSWq"})
 
 @app.route('/getInfo', methods=['GET'])
 def getInfo():
+    logger(on=log, path=log_path)
     return '<title>M/E CW Detection API</title>This API is used to detect the code switching point between English and Māori.<br/><br/>Query format: /?model=&ltmodel_name&gt&text=&lttext&gt<br/><br/>Response JSON format:<br/><br/>{}<br/><br/>where E is English, M is Māori<br/><br/>To get the list of models, visit <a href="./getModel">getModel</a>.<br/><br/>To get the usage and the purpose of the API, visit <a href="./getInfo">getInfo</a>.<r/><br/><br/>For more information of the definition of code switch detection and the models used, please visit: <a href="https://openreview.net/forum?id=rAxl_GibSWq" target="_blank" rel="noopener noreferrer">https://openreview.net/forum?id=rAxl_GibSWq</a><div style="position:fixed;bottom:0;background-color:white;width:100%"><div style="text-align:center"><label style="padding-right:4px;">Copyright © 2022</label><a href="https://speechresearch.auckland.ac.nz/">Speech Research Group @ UoA</a><label>. All rights reserved.</label></div></div>'.format(output_format)
 
 @app.errorhandler(404)
-def not_found(error):
+def notFound(error):
+    logger(on=log, path=log_path)
     return redirect('/getInfo') # Modify to other route
 
 @app.route('/', methods=['GET'])
 def detect():
+    logger(on=log, path=log_path)
     args = request.args
     if 'model' not in args or 'text' not in args:
         return redirect('/getInfo') # Modify to other route
@@ -325,7 +350,6 @@ def detect():
             return redirect('/getInfo') # Modify to other route
 
         ### Output ###
-        print(prediction_result)
         outdict = {}
         outdict['input'] = input_text
         outdict['cleaned'] = cleaned_text
