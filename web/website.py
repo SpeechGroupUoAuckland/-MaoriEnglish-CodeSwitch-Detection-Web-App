@@ -300,7 +300,8 @@ if NO_INIT:
 st.set_page_config(
     layout='wide',
     page_title="M/E CW Detection",
-    page_icon="https://aotearoavoices.nz/favicon.ico",
+    # page_icon="https://aotearoavoices.nz/favicon.ico",
+    page_icon="frontend/public/favicon.ico",
     menu_items={
         'Get Help': 'https://speechresearch.auckland.ac.nz/',
         'Report a bug': "https://speechresearch.auckland.ac.nz/",

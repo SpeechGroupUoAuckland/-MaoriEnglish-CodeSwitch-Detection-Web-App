@@ -9,7 +9,8 @@
 #   /getInfo -> string The usage and the purpose of the API
 ###############################################################
 
-from flask import Flask, redirect, request, jsonify, Response
+import os
+from flask import Flask, redirect, request, jsonify, Response, send_from_directory
 from flask_restful import Api
 import re
 import pickle
@@ -281,7 +282,8 @@ avaliable_models = ['size_2_bilstm', 'size_2_bilstm_lower', 'size_3_bilstm', 'si
 @app.route('/favicon.ico', methods=['GET'])
 def favicon():
     logger(on=log, path=log_path)
-    return redirect("https://aotearoavoices.nz/favicon.ico")
+    # return redirect("https://aotearoavoices.nz/favicon.ico")
+    return send_from_directory(os.path.join(app.root_path, 'frontend/public'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/robots.txt', methods=['GET'])
 def robots():
@@ -356,6 +358,11 @@ def detect():
         outdict['labels'] = [ 'M' if np.argmax(item[1:], axis=0) == 0 else 'E' for item in prediction_result ]
         outdict['probability'] = [ [f'{item[1]:.2f}', f'{item[2]:.2f}'] for item in prediction_result ]
         return jsonify(outdict)
+
+@app.after_request
+def remove_header(response):
+    del response.headers['Server']
+    return response
 
 if __name__ == '__main__':
     # Bind 127.0.0.1:8500, only accept connections from localhost

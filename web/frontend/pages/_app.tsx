@@ -11,10 +11,14 @@ function MyApp({ Component, pageProps }: AppProps) {
     <Provider store={langStates}>
       <Head>
         <title>M/E CW Detection</title>
-        <link rel="icon" href="https://aotearoavoices.nz/favicon.ico" />
+        {/* <link rel="icon" href="https://aotearoavoices.nz/favicon.ico" /> */}
       </Head>
       <header className="fixed top-0 left-0 right-0 flex flex-row items-center justify-between bg-gray-200 p-4 opacity-100">
-        <a href="https://www.auckland.ac.nz/" target="_blank" rel="noopener noreferrer">
+        <a
+          href="https://www.auckland.ac.nz/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <img
             src="https://blogs.auckland.ac.nz/files/2016/07/UOA-NT-HC-RGB-1dr6b6b.png"
             className="h-12"
@@ -54,6 +58,15 @@ function MyApp({ Component, pageProps }: AppProps) {
           . All rights reserved.
         </label>
       </footer>
+      <button
+        className="h-15 w-25 sticky bottom-20 left-2 rounded bg-lime-600 px-1 py-3 font-bold text-white shadow hover:bg-lime-700"
+        type="button"
+        onClick={() =>
+          window.open('https://forms.gle/K73u9x394zzneYsB6', '_blank')
+        }
+      >
+        Feedback
+      </button>
     </Provider>
   )
 }
