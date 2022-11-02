@@ -257,20 +257,21 @@ export default function StartPage() {
                     '?model=' +
                     selectedModel +
                     '&text=' +
-                    inputText
+                    inputText, { signal: AbortSignal.timeout(15000) }
                 )
                   .then((res) => res.json())
                   .then((data) => {
                     setPrediction(data)
+                    setTimeout(() => {
+                      setLoadingState(false)
+                    }, 600)
                   })
                   .catch((rejected) => {
                     console.log(rejected)
+                    setTimeout(() => {
+                      setLoadingState(false)
+                    }, 600)
                   })
-
-                setTimeout(() => {
-                  setLoadingState(false)
-                }, 600)
-                // setLoadingState(false)
               }}
             >
               {uiSentenceList ? uiSentenceList[4] : ''}
