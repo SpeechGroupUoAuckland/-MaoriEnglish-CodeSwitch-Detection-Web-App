@@ -257,7 +257,8 @@ export default function StartPage() {
                     '?model=' +
                     selectedModel +
                     '&text=' +
-                    inputText, { signal: AbortSignal.timeout(15000) }
+                    inputText,
+                  { signal: AbortSignal.timeout(15000) }
                 )
                   .then((res) => res.json())
                   .then((data) => {
