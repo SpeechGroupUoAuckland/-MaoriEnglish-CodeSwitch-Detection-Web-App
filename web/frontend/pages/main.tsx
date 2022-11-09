@@ -60,7 +60,7 @@ export default function StartPage() {
       setTimeout(() => {
         const response = new Response(
           JSON.stringify({
-            cleaned: `Timeout after ${timer} seconds, please try again.`,
+            cleaned: `Timeout after ${timer/1000} seconds, please try again.`,
             probability: [
               ['0.00', '1.00'],
               ['0.00', '1.00'],
