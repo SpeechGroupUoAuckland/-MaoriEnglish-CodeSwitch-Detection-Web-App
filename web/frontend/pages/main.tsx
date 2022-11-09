@@ -302,11 +302,11 @@ export default function StartPage() {
           </div>
         </div>
         {isLoading ? (
-          <div className="flex h-96 w-full flex-row items-center justify-center rounded bg-gray-100 shadow">
+          <div className="h-fit min-h-96 w-full flex-row items-center justify-center rounded bg-gray-100 shadow">
             <CircularProgress />
           </div>
         ) : (
-          <div className="h-96 w-full rounded bg-gray-100 p-2 shadow">
+          <div className="h-fit min-h-96 w-full rounded bg-gray-100 p-2 shadow">
             {renderPrediction(prediction ? prediction : undefined, verbose)}
           </div>
         )}
