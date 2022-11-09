@@ -29,6 +29,9 @@ export default function StartPage() {
   const [verbose, setVerbose] = useState<boolean>(false)
   const [showVerboseInfo, setShowVerboseInfo] = useState<boolean>(false)
 
+  let controller = new AbortController();
+  let signal = controller.signal;
+
   useEffect(() => {
     if (lang?.global.lang === undefined) {
       router.push('/')
@@ -51,6 +54,21 @@ export default function StartPage() {
         console.log(rejected)
       })
   }, [lang, router, langState])
+
+  function timeoutAction(timer: number) {
+    return new Promise(reslove => {
+      setTimeout(() => {
+        const response = new Response(
+          JSON.stringify({
+            cleaned: `Timeout after ${timer} seconds, please try again.`,
+            probability: [["0.00","1.00"], ["0.00","1.00"], ["0.00","1.00"], ["0.00","1.00"], ["0.00","1.00"], ["0.00","1.00"], ["0.00","1.00"]]
+          })
+        );
+        reslove(response);
+        controller.abort();
+      }, timer);
+    });
+  };
 
   function renderPrediction(result: Prediction | undefined, verbose: boolean) {
     const r = result ? result : undefined
@@ -252,15 +270,17 @@ export default function StartPage() {
               type="button"
               onClick={() => {
                 setLoadingState(true)
-                fetch(
+                Promise.race([timeoutAction(15000),
+                  fetch(
                   '/api/detect' +
                     '?model=' +
                     selectedModel +
                     '&text=' +
-                    inputText,
-                  { signal: AbortSignal.timeout(15000) }
-                )
-                  .then((res) => res.json())
+                    inputText, {
+                      signal: signal
+                    }
+                )])
+                  .then((res: any) => res.json())
                   .then((data) => {
                     setPrediction(data)
                     setTimeout(() => {
@@ -302,7 +322,7 @@ export default function StartPage() {
           </div>
         </div>
         {isLoading ? (
-          <div className="h-fit min-h-96 w-full flex-row items-center justify-center rounded bg-gray-100 shadow">
+          <div className="h-fit min-h-96 w-full flex flex-row items-center justify-center rounded bg-gray-100 shadow">
             <CircularProgress />
           </div>
         ) : (
