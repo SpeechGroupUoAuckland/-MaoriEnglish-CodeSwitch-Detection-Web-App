@@ -330,8 +330,31 @@ def main():
     if len(args) > 1:
         args = args[1:]
         if args[0] == '-h' or args[0] == '--help':
-            print('Usage: python3 modelTest.py [model_name] [window_size]')
-            print('Example: python3 modelTest.py mbert 5')
+            print('Usage1: python3 modelTest.py [model_name] [window_size]')
+            print('\tExample: python3 modelTest.py mbert 5')
+            print('Usage2: python3 -h or python3 --help')
+            print('Usage3: python3 -n NUM_CPU')
+        elif args[0] == '-n':
+            import multiprocessing
+            multiprocessing.freeze_support()
+            multiprocessing.set_start_method('spawn')
+            n_cores = int(args[1])
+            pool = multiprocessing.Pool(processes=n_cores)
+            pool.starmap(test_model, [
+                ('size_2_bilstm', 2),
+                ('size_2_bilstm_lower', 2),
+                ('size_3_bilstm', 3),
+                ('size_3_bilstm_lower', 3),
+                ('full_size_bilstm', 250),
+                ('full_size_bilstm_lower', 250),
+                ('size_2_mbert', 2),
+                ('size_2_mbert_lower', 2),
+                ('size_3_mbert', 3),
+                ('size_3_mbert_lower', 3),
+                ('full_size_mbert', 4),
+                ('full_size_mbert_lower', 4),
+            ])
+
         else:
             test_model(args[0], int(args[1]))
     else:
