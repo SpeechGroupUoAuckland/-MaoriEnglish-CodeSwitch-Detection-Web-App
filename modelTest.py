@@ -14,7 +14,7 @@ import numpy as np
 # Read test set
 test = pd.read_csv('20220321_Hansard_DB_test_MP_only.csv')
 # only take the rows with Processed = 'Y'
-test = test[test['Processed'] == 'Y']
+test = test[test['Processed'] == 'Y'].head(100)
 
 base_folder = './web/models/'
 # Parameters #
@@ -271,6 +271,11 @@ def test_model(model_name, window_size):
     wrong_sentence_count = 0
     wrong_sentence_list = [] # [row.id1, row.id2, ...]
 
+    maori_mispredicted_as_english = 0
+    maori_predicted_as_maori = 0
+    english_mispredicted_as_maori = 0
+    english_predicted_as_english = 0
+
     for row in test.itertuples():
         text = row.text.lower() if lower_flag else row.text
         prediction_result = detectWrapper(text, window_size, model)
@@ -281,6 +286,12 @@ def test_model(model_name, window_size):
             word_count += len(real)
             for index, item in enumerate(predict):
                 if item != real[index]:
+                    if item == 'M':
+                        english_mispredicted_as_maori += 1
+                    elif item == 'P':
+                        maori_mispredicted_as_english += 1
+                    else:
+                        pass
                     wrong_sentence = True
                     wrong_word_count += 1
                     current_word = row.text.split()[index].lower()
@@ -289,20 +300,26 @@ def test_model(model_name, window_size):
                     else:
                         wrong_word_dict[current_word] += 1
                 else:
-                    pass
+                    if item == 'M':
+                        maori_predicted_as_maori += 1
+                    elif item == 'P':
+                        english_predicted_as_english += 1
+                    else:
+                        pass
             if wrong_sentence:
                 wrong_sentence_count += 1
-                wrong_sentence_list.append(row.id)
+                wrong_sentence_list.append(row.id+f'{row.number}')
             else:
                 pass
             sentence_count += 1
         else:
-            # print("Error: length of predict and real is not equal,", row.id)
+            # print("Error: length of predict and real is not equal,", row.id+row.number)
             pass
 
     # Save the wrong words and wrong sentences
     with open(f"evaluation/{model_name}_error_dict.json", "w") as f:
-        f.write('{\n'+f'"{wrong_word_count}/{word_count}":')
+        f.write('{\n"confusion_matrix": '+f'[[{maori_predicted_as_maori}, {maori_mispredicted_as_english}], [{english_mispredicted_as_maori}, {english_predicted_as_english}]],\n')
+        f.write(f'"{wrong_word_count}/{word_count}":')
         json.dump(wrong_word_dict, f)
         f.write(f',\n"{wrong_sentence_count}/{sentence_count}":')
         json.dump(wrong_sentence_list, f)
