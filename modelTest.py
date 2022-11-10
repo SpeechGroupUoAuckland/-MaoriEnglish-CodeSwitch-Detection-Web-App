@@ -14,7 +14,7 @@ import numpy as np
 # Read test set
 test = pd.read_csv('20220321_Hansard_DB_test_MP_only.csv')
 # only take the rows with Processed = 'Y'
-test = test[test['Processed'] == 'Y'].head(100)
+test = test[test['Processed'] == 'Y']
 
 base_folder = './web/models/'
 # Parameters #
